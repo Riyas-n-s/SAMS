@@ -27,7 +27,8 @@ DEBUG = os.getenv("DEBUG") == "True"
 
 import os
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
+
 
 
 # Application definition
@@ -124,10 +125,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-from pathlib import Path
-import os
-
-BASE_DIR = Path(__file__).resolve().parent.parent  # Use Path consistently
 
 STATIC_URL = '/static/'
 
