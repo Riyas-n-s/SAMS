@@ -1,0 +1,102 @@
+{% extends 'teachers/base_teacher.html' %}
+{% block content %}
+<div class="container-fluid p-4">
+    <h3 class="mb-4">Manage Study Materials</h3>
+
+    <div class="row g-4">
+        <!-- Study Material Upload -->
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <i class="fa-solid fa-book"></i> Upload Study Material
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="upload_type" value="material">
+                        {{ material_form.subject }}
+                        {{ material_form.title }}
+                        {{ material_form.file }}
+                        <button class="btn btn-success w-100 mt-2"><i class="fa-solid fa-upload"></i> Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recorded Class Upload -->
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <i class="fa-solid fa-video"></i> Upload Recorded Class
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="upload_type" value="recorded">
+                        {{ recorded_form.subject }}
+                        {{ recorded_form.title }}
+                        {{ recorded_form.link }}
+                        <button class="btn btn-primary w-100 mt-2"><i class="fa-solid fa-link"></i> Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Previous Year Questions -->
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-white">
+                    <i class="fa-solid fa-file-lines"></i> Upload Question Paper
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="upload_type" value="question">
+                        {{ question_form.subject }}
+                        {{ question_form.title }}
+                        {{ question_form.file }}
+                        <button class="btn btn-warning w-100 mt-2"><i class="fa-solid fa-upload"></i> Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Uploaded -->
+    <div class="card mt-4">
+        <div class="card-header bg-dark text-white">
+            <i class="fa-solid fa-gear"></i> Uploaded Materials
+        </div>
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Subject</th>
+                        <th>Uploaded</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in materials %}
+                    <tr>
+                        <td>{{ material.title }}</td>
+                        <td>{{ material.get_upload_type_display }}</td>
+                        <td>{{ material.subject }}</td>
+                        <td>{{ material.uploaded_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{% url 'delete_material' material.pk %}" class="btn btn-sm btn-danger">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted">No materials uploaded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

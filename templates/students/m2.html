@@ -1,0 +1,36 @@
+{% extends 'students/base_student.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4">Available Study Materials</h3>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Subject</th>
+                <th>Uploaded On</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for material in materials %}
+            <tr>
+                <td>{{ material.title }}</td>
+                <td>{{ material.get_upload_type_display }}</td>
+                <td>{{ material.subject }}</td>
+                <td>{{ material.uploaded_at|date:"d M Y" }}</td>
+                <td>
+                    {% if material.file %}
+                        <a href="{{ material.file.url }}" class="btn btn-sm btn-success" download>Download</a>
+                    {% elif material.link %}
+                        <a href="{{ material.link }}" class="btn btn-sm btn-primary" target="_blank">Open Link</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted">No study materials available yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

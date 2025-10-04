@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulk Upload Students (CSV)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        background-color: #f1f3f6;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .form-card {
+        max-width: 750px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+    .form-card h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+        color: #222;
+    }
+</style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2><i class="fas fa-upload me-2"></i>Bulk Upload Students (CSV)</h2>
+
+    <!-- Display messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Improperly Formatted Rows -->
+    {% if invalid_rows %}
+    <div class="alert alert-danger">
+        <strong>Improperly Formatted Rows:</strong> The following CSV row numbers have missing or extra columns: {{ invalid_rows|join:", " }}
+    </div>
+    {% endif %}
+
+    <!-- Duplicate Students Table -->
+    {% if duplicate_students %}
+    <div class="alert alert-warning">
+        <strong>Duplicate Records Found:</strong> These students were already in the database and were not uploaded.
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Register Number</th>
+                    <th>Name</th>
+                    <th>Branch</th>
+                    <th>Semester</th>
+                    <th>Roll Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in duplicate_students %}
+                <tr>
+                    <td>{{ s.register_number }}</td>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.branch }}</td>
+                    <td>{{ s.semester }}</td>
+                    <td>{{ s.roll_number }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- CSV Upload Form -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label" for="{{ form.file.id_for_label }}">Choose CSV File</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-file-csv"></i></span>
+                <input type="file" name="file" class="form-control" id="{{ form.file.id_for_label }}">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary"><i class="fas fa-upload me-1"></i> Upload</button>
+    </form>
+
+    <hr>
+    <p><b>CSV Format:</b></p>
+    <pre>register_number,name,branch,semester,roll_number</pre>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

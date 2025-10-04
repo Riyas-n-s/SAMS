@@ -1,0 +1,709 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+
+:root {
+    --primary:#101c3f; --secondary:#007bff; --accent:#ff5722; 
+    --light:#f8f8f8; --text-dark:#333; --text-light:#e0e0e0;
+}
+
+body { background-color: var(--light); color: var(--text-dark); }
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ===== Navbar ===== */
+.navbar {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px 5%; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    z-index:10; position:sticky; top:0;
+    opacity:0; transform:translateY(-30px);
+    transition: all 1s ease;
+}
+.navbar.active { opacity:1; transform:translateY(0); }
+
+.logo { font-size:24px; font-weight:700; color:var(--primary); }
+.navbar nav { display:flex; align-items:center; }
+.navbar a { text-decoration:none; color:var(--text-dark); margin-left:25px; font-weight:600; transition:0.3s; }
+.navbar a:hover { color:var(--secondary); }
+.faq-btn { background:var(--secondary); color:#fff !important; padding:8px 15px; border-radius:5px; margin-left:30px; }
+
+/* ===== Hero + Features Section ===== */
+.hero-features-section {
+    background-color:#fff;
+    position:relative;
+    overflow:hidden;
+    padding-bottom:auto;
+}
+
+.hero-features-wrapper {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    flex-wrap:wrap; padding:80px 5% 50px; max-width:1200px; margin:0 auto;
+}
+
+/* ===== Scroll Animations ===== */
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+.scroll-animate.fade-left { transform: translateX(-50px); }
+.scroll-animate.fade-right { transform: translateX(50px); }
+.scroll-animate.fade-up { transform: translateY(30px); }
+.scroll-animate.active {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+}
+
+/* ===== Hero Content ===== */
+.hero-content { max-width:55%; }
+.hero-content h1 { font-size:4.5vw; font-weight:900; line-height:1.1; color:var(--primary); margin-bottom:20px; }
+.hero-content p { font-size:1.25rem; color:#666; margin-bottom:40px; line-height:1.5; }
+.cta-button { padding:15px 35px; background:var(--primary); color:#fff; text-decoration:none; border-radius:8px; font-weight:600; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.cta-button:hover { background:var(--secondary); transform:scale(1.05); box-shadow:0 10px 20px rgba(0,0,0,0.2); }
+
+.hero-illustration { max-width:40%; display:flex; justify-content:center; align-items:center; }
+.hero-illustration img { max-width:120%; height:auto; border-radius:15px; }
+
+/* ===== Features Section ===== */
+.features-wrapper {
+    display:flex; justify-content:space-between; gap:40px; margin-top:0; flex-wrap:wrap;
+    background-color:var(--primary); color:var(--text-light); padding:80px 40px 60px; border-radius:30px 30px 0 0; position:relative;
+}
+
+.feature-card { flex:1; text-align:center; padding:20px 10px; transition: transform 0.4s ease, box-shadow 0.4s ease; }
+.feature-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+
+.feature-icon { width:100px; height:100px; border-radius:50%; margin:0 auto 20px; display:flex; justify-content:center; align-items:center; font-weight:900; font-size:30px; transition: transform 0.4s ease, background-color 0.4s ease, color 0.4s ease; }
+.feature-card:hover .feature-icon { transform: scale(1.2); background-color: rgba(255,255,255,0.1); }
+
+.blue-icon { border:2px solid #0d83c6; color:#0d83c6; }
+.orange-icon { border:2px solid var(--accent); color:var(--accent); }
+.lightblue-icon { border:2px solid #00bcd4; color:#00bcd4; }
+
+.feature-card h3 { font-size:1.5rem; font-weight:600; margin-bottom:10px; color:#fff; }
+.feature-card p { font-size:1rem; line-height:1.4; color:var(--text-light); }
+
+/* ===== Wave Animation ===== */
+.wave-container {
+    position: absolute; bottom:0; left:0; width:100%; overflow:hidden; line-height:0;
+}
+.wave-container svg { width:200%; height:150px; display:block; }
+.wave-container path { fill:var(--primary); animation: waveMove 6s linear infinite alternate; }
+@keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* ===== Mobile Responsiveness ===== */
+@media(max-width:768px) {
+    .hero-features-wrapper { flex-direction:column; align-items:center; }
+    .hero-content, .hero-illustration { max-width:100%; text-align:center; }
+    .hero-illustration { margin-bottom:40px; }
+    .features-wrapper { flex-direction:column; padding:60px 20px; border-radius:20px 20px 0 0; margin-top:0; }
+    .feature-card { margin-bottom:40px; }
+}
+@keyframes zoomPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.hero-illustration img {
+    animation: zoomPulse 6s ease-in-out infinite;
+}
+
+
+  
+
+
+.top-feature-section {
+    background-color: #ffffff;
+    padding: 50px 5%;
+}
+
+.top-feature-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Feature Row */
+.feature-row {
+    
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+.feature-row.reverse { flex-direction: row-reverse; }
+
+.feature-image {
+    flex: 1 1 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.feature-image img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 15px;
+    
+    transition: transform 0.3s ease;
+}
+.feature-image img:hover { transform: scale(1.05); }
+
+.feature-content {
+    flex: 1 1 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.feature-content h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #101c3f;
+}
+.feature-content p {
+    font-size: 1rem;
+    margin-bottom: 0;
+    color: #555;
+    line-height: 1.5;
+}
+
+/* Explore Button */
+.explore-btn-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0; /* spacing above and below */
+}
+
+
+
+.btn-explore {
+    padding: 14px 40px;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-explore:hover { background-color: #0056b3; }
+
+/* Scroll animation activation */
+.scroll-animate.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media(max-width: 992px){
+    .feature-row, .feature-row.reverse { flex-direction: column; gap: 30px; }
+    .feature-content, .feature-image { text-align: center; }
+}
+
+div.navbar-center img {
+    margin-left: 185px;
+    margin-top:10px;
+    height: 70px;
+    width: 70px;
+    
+}
+
+:root {
+    --dark-bg: #101010;
+    --text-color: #ffffff;
+    --logo-font: 'Arial Black', sans-serif;
+}
+
+.site-footer {
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    padding: 60px 20px 40px;
+    font-family: Arial, sans-serif;
+        margin-top: auto;
+}
+
+.site-footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #333;
+    padding-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+}
+
+.company-info .logo2 {
+    font-size: 36px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-family: var(--logo-font);
+}
+
+.company-info address {
+    font-style: normal;
+    line-height: 1.6;
+}
+
+.contact-social {
+    text-align: right;
+}
+
+.contact-heading {
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.contact-social p, .contact-social a {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.contact-social a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.contact-social a:hover {
+    text-decoration: underline;
+}
+
+.social-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.social-links a {
+    color: var(--text-color);
+    font-size: 18px;
+    transition: 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #ff8c3a;
+    transform: scale(1.2);
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.footer-bottom .legal-links a {
+    margin-left: 20px;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.footer-bottom .legal-links a:hover {
+    text-decoration: underline;
+}
+
+.whatsapp-icon-placeholder {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .contact-social {
+        text-align: center;
+    }
+
+    .social-links {
+        justify-content: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-bottom .legal-links a {
+        margin: 5px 10px 0 0;
+    }
+}
+.about-section {
+      padding: 80px 20px;
+    }
+    .about-section h2, 
+    .how-section h2 {
+      color: #0d6efd;
+      font-size: 2.5rem;
+    }
+    .about-card i, 
+    .how-card i {
+      font-size: 3rem;
+      color: #0d6efd;
+    }
+    .about-card, 
+    .how-card {
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: none;
+    }
+    .about-card:hover, 
+    .how-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+    .about-divider, 
+    .how-divider {
+      width: 80px; 
+      height: 4px; 
+      background-color: #0d6efd; 
+      margin: 0 auto 30px;
+      border-radius: 2px;
+    }
+</style>
+</head>
+
+<body>
+
+<header class="navbar" style="display:flex; align-items:center; justify-content:space-between; padding:10px 20px;">
+    
+    <!-- Left side: SAM text -->
+    <div class="navbar-left" style="font-size:24px; font-weight:700; color:#101c3f;">
+        SAMS
+    </div>
+
+    <!-- Center: Logo -->
+    <div class="navbar-center">
+        <img src="{% static 'accounts/images/logo.jpeg' %}" alt="SAMS Logo" >
+    </div>
+
+    <!-- Right side: navigation links -->
+    <nav class="navbar-right">
+        <a href="{% url 'loader_page' 'home' %}">Home</a>
+        <a href="{% url 'loader_page' 'about' %}">About</a>
+        <a href="{% url 'loader_page' 'contact' %}">Contact</a>
+        <!-- FAQ removed -->
+    </nav>
+
+</header>
+
+
+<section class="hero-features-section">
+    <div class="hero-features-wrapper">
+        <div class="hero-content scroll-animate" data-animate="fade-left">
+            <h1>Unlock the Power of Smart Learning</h1>
+            <p>Revolutionize your academic experience with our comprehensive platform designed for <b>Students and Teachers</b>.</p>
+            <a href="{% url 'loader_page' 'login' %}" class="cta-button">Get Started</a>
+        </div>
+        <div class="hero-illustration scroll-animate" data-animate="fade-right">
+            <img src="{% static 'accounts/images/first.0.2.jpeg' %}" alt="LMS Illustration">
+        </div>
+    </div>
+
+    <div class="features-wrapper">
+        <div class="feature-card scroll-animate" data-animate="fade-up">
+            <div class="feature-icon blue-icon">e</div>
+            <h3>Streamline Your Workflows</h3>
+            <p>Eliminate the Hassle of Paperwork and Embrace Digital Efficiency for a Seamless Academic Journey.</p>
+        </div>
+        <div class="feature-card scroll-animate" data-animate="fade-up">
+            <div class="feature-icon orange-icon">8</div>
+            <h3>Real-Time Attendance Tracking</h3>
+            <p>Stay on Top of Student Attendance and Ensure Accountability with Our Automated Attendance System.</p>
+        </div>
+        <div class="feature-card scroll-animate" data-animate="fade-up">
+            <div class="feature-icon lightblue-icon">P</div>
+            <h3>Maximize Your Progress</h3>
+            <p>Leverage Powerful CGPA and SGPA Calculation Tools to Monitor Your Progress and Make Informed Decisions.</p>
+        </div>
+    </div>
+
+    
+
+    <section class="top-feature-section">
+  <div class="top-feature-wrapper">
+
+    <!-- ===== Top Row: Raise Doubts ===== -->
+<!-- ===== Top Row: Raise Doubts ===== -->
+<div class="feature-row scroll-animate" data-animate="fade-left">
+  <div class="feature-image">
+    <img src="{% static 'accounts/images/chat.jpeg' %}" alt="Raise Doubts Illustration">
+  </div>
+  <div class="feature-content">
+    <h2>Raise Student Doubts & Chat</h2>
+    <p>Engage in instant discussions and clarify doubts with dedicated chat support. Connect instructors, peers, and collaborate in real-time for a richer learning experience.</p>
+  </div>
+</div>
+
+<!-- ===== Centered Explore Button ===== -->
+<div class="explore-btn-wrapper scroll-animate" data-animate="fade-up">
+  <a href="{% url 'loader_page' 'login' %}" class="btn-explore">Explore SAMS</a>
+</div>
+
+<!-- ===== Bottom Row: No-Dues ===== -->
+<div class="feature-row reverse scroll-animate" data-animate="fade-right">
+  <div class="feature-image">
+    <img src="{% static 'accounts/images/nodues.jpeg' %}" alt="No-Dues Illustration">
+  </div>
+  <div class="feature-content">
+    <h2>No-Dues Clearance</h2>
+    <p>Automate your No-Due process and eliminate the hassle of manual paperwork. Our LMS platform streamlines the entire procedure, saving you time and effort.</p>
+  </div>
+</div>
+
+
+    <!-- ===== Explore Button ===== -->
+    
+  </div>
+  <!-- How It Works Section -->
+  <section class="how-section py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold mb-3">How SAMS Works</h2>
+        <div class="how-divider"></div>
+        <p class="text-secondary px-md-5">
+          A simple 4-step process to manage academics smarter and faster.
+        </p>
+      </div>
+
+      <div class="row text-center g-4">
+        <!-- Step 1 -->
+        <div class="col-md-3">
+          <div class="p-4 bg-white rounded shadow-sm how-card h-100">
+            <i class="bi bi-person-check mb-3"></i>
+            <h5 class="fw-bold">1. Login Securely</h5>
+            <p>Students and teachers sign in with their credentials.</p>
+          </div>
+        </div>
+        <!-- Step 2 -->
+        <div class="col-md-3">
+          <div class="p-4 bg-white rounded shadow-sm how-card h-100">
+            <i class="bi bi-book mb-3"></i>
+            <h5 class="fw-bold">2. Access Resources</h5>
+            <p>Find study materials, assignments, and notes easily.</p>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div class="col-md-3">
+          <div class="p-4 bg-white rounded shadow-sm how-card h-100">
+            <i class="bi bi-clipboard-check mb-3"></i>
+            <h5 class="fw-bold">3. Submit & Track</h5>
+            <p>Submit assignments, track attendance and dues in real-time.</p>
+          </div>
+        </div>
+        <!-- Step 4 -->
+        <div class="col-md-3">
+          <div class="p-4 bg-white rounded shadow-sm how-card h-100">
+            <i class="bi bi-graph-up-arrow mb-3"></i>
+            <h5 class="fw-bold">4. Monitor Progress</h5>
+            <p>View CGPA updates and performance insights instantly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- About Us Section -->
+  <section class="about-section">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold mb-3">About SAMS</h2>
+        <div class="about-divider"></div>
+       <p class="lead mb-3" 
+   style="font-family: 'Roboto', sans-serif; font-size: 1.3rem; line-height: 1; color:black;">
+          SAMS Smart Academic Management System is a modern academic platform designed to make learning and teaching more efficient and connected. Our mission is to provide students and teachers with a seamless, intuitive platform to access academic resources, track performance, and manage tasks in real-time.
+        </p>
+        <p class="text-secondary px-md-5">
+          "With features like attendance tracking, assignment submissions, CGPA calculators, study material sharing, and No Dues management, SAMS ensures that students and teachers stay informed and organized"
+
+
+
+        </p>
+      </div>
+
+      <div class="row text-center g-4">
+        <!-- Mission -->
+        <div class="col-md-4">
+          <div class="p-4 bg-white rounded shadow-sm about-card h-100">
+            <i class="bi bi-bullseye mb-3"></i>
+            <h4 class="fw-bold">Our Mission</h4>
+            <p>To empower students and educators with a smart, user-friendly system that simplifies academic management and enhances learning outcomes.</p>
+          </div>
+        </div>
+
+        <!-- Vision -->
+        <div class="col-md-4">
+          <div class="p-4 bg-white rounded shadow-sm about-card h-100">
+            <i class="bi bi-eye mb-3"></i>
+            <h4 class="fw-bold">Our Vision</h4>
+            <p>To create a connected academic ecosystem where technology bridges the gap between students and teachers, making learning more accessible, transparent, and efficient.</p>
+          </div>
+        </div>
+
+        <!-- Values -->
+        <div class="col-md-4">
+          <div class="p-4 bg-white rounded shadow-sm about-card h-100">
+            <i class="bi bi-stars mb-3"></i>
+            <h4 class="fw-bold">Our Values</h4>
+            <ul class="list-unstyled mb-0">
+              <li><strong>Innovation:</strong> Keep improving.</li>
+              <li><strong>Efficiency:</strong> Simplify tasks.</li>
+              <li><strong>Transparency:</strong> Clear and real-time.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+<!-- SAMS Footer -->
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+            <!-- Company Info -->
+            <div class="footer-section company-info">
+                <div class="logo2">SAMS</div>
+                <p class="company-name">Government Polytechnic College,</p>
+                <address>
+                    Nedumangadu, TVM,<br>
+                    Kerala, India - 695xxx
+                </address>
+            </div>
+
+            <!-- Contact & Social -->
+            <div class="footer-section contact-social">
+                <h4 class="contact-heading">Contact</h4>
+                <p class="phone-number"><i></i>+91 98765 43210</p>
+                <p class="email"><a href="mailto:haisams@gmail.com">haisams@gmail.com</a></p>
+
+                <div class="social-links">
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <p class="copyright">&copy; 2025 SAMS. All rights reserved</p>
+            <div class="legal-links">
+                <a href="{% url 'loader_page' 'terms' %}">Terms of Service</a>
+                <a href="{% url 'loader_page' 'privacy' %}">Privacy Policy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Floating Button -->
+
+</footer>
+
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+
+
+
+<!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+
+
+    
+  
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+// ===== Navbar animation on load =====
+window.addEventListener('load', () => {
+    document.querySelector('.navbar').classList.add('active');
+});
+
+// ===== Scroll-based animations =====
+function scrollAnimate() {
+    const elements = document.querySelectorAll('.scroll-animate');
+    const windowBottom = window.innerHeight;
+
+    elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if(rect.top < windowBottom - 50) {
+            el.classList.add('active');
+        }
+    });
+}
+
+window.addEventListener('scroll', scrollAnimate);
+window.addEventListener('load', scrollAnimate);
+
+
+// Scroll-based animations
+function scrollAnimate() {
+    const elements = document.querySelectorAll('.scroll-animate');
+    const windowBottom = window.innerHeight;
+    elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if(rect.top < windowBottom - 50) el.classList.add('active');
+    });
+}
+window.addEventListener('scroll', scrollAnimate);
+window.addEventListener('load', scrollAnimate);
+</script>
+
+</body>
+</html>

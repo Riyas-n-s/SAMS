@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service - SAMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      padding-top: 20px;
+      padding-bottom: 60px;
+    }
+
+    .top-home {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .top-home a {
+      text-decoration: none;
+      background-color: #0d6efd;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 25px;
+      transition: 0.3s;
+    }
+
+    .top-home a:hover {
+      background-color: #0b5ed7;
+      color: #fff;
+    }
+
+    .tos-section {
+      background: #fff;
+      padding: 50px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      color: #0d6efd;
+      font-weight: 700;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #0d6efd;
+      margin-top: 30px;
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    p {
+      line-height: 1.8;
+      margin-bottom: 15px;
+      color: #555;
+    }
+
+    ul {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .tos-section a {
+      color: #0d6efd;
+      text-decoration: none;
+    }
+
+    .tos-section a:hover {
+      text-decoration: underline;
+    }
+/* Footer */
+    :root {
+      --dark-bg: #101010;
+      --text-color: #ffffff;
+      --logo-font: 'Arial Black', sans-serif;
+    }
+
+    .site-footer {
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+      padding: 60px 20px 40px;
+      font-family: Arial, sans-serif;
+    }
+
+    .site-footer .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #333;
+      padding-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .footer-section {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .company-info .logo2 {
+      font-size: 36px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      font-family: var(--logo-font);
+    }
+
+    .company-info address {
+      font-style: normal;
+      line-height: 1.6;
+    }
+
+    .contact-social {
+      text-align: right;
+    }
+
+    .contact-heading {
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .contact-social p, .contact-social a {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .contact-social a {
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    .contact-social a:hover {
+      text-decoration: underline;
+    }
+
+    .social-links {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+
+    .social-links a {
+      color: var(--text-color);
+      font-size: 18px;
+      transition: 0.3s ease;
+    }
+
+    .social-links a:hover {
+      color: #ff8c3a;
+      transform: scale(1.2);
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .footer-bottom .legal-links a {
+      margin-left: 20px;
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    .footer-bottom .legal-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+      }
+
+      .contact-social {
+        text-align: center;
+      }
+
+      .social-links {
+        justify-content: center;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-bottom .legal-links a {
+        margin: 5px 10px 0 0;
+      }
+    }
+
+    p.company-name{
+      color: #f4f6f9;
+    }
+    p.copyright{
+      color: #f4f6f9;
+    }
+    p.phone-number{
+      color: #f4f6f9;
+    }
+  
+  
+  </style>
+</head>
+<body>
+
+<!-- Back to Home -->
+<div class="top-home">
+    <a href="{% url 'home' %}"><i class="fas fa-home me-2"></i>Back to Home</a>
+</div>
+
+<!-- Terms of Service Section -->
+<div class="container tos-section">
+  <h1>Terms of Service</h1>
+
+  <p>Welcome to <strong>SAMS (Smart Academic Management System)</strong>. By accessing or using our platform, you agree to comply with and be bound by these terms. Please read them carefully.</p>
+
+  <h2>1. Use of the Platform</h2>
+  <p>SAMS is intended solely for educational purposes. Users must not:</p>
+  <ul>
+    <li>Post offensive, inappropriate, or illegal content.</li>
+    <li>Attempt unauthorized access to other users' accounts or system resources.</li>
+    <li>Use the platform for commercial purposes without explicit permission.</li>
+  </ul>
+
+  <h2>2. Account Responsibility</h2>
+  <p>Users are responsible for maintaining the confidentiality of their login credentials. You agree to:</p>
+  <ul>
+    <li>Keep your account information secure and private.</li>
+    <li>Notify us immediately of any unauthorized use of your account.</li>
+    <li>Be responsible for all activities conducted under your account.</li>
+  </ul>
+
+  <h2>3. Intellectual Property</h2>
+  <p>All content on SAMS, including text, graphics, logos, icons, images, and software, is protected by intellectual property laws. Users may not:</p>
+  <ul>
+    <li>Copy, reproduce, or redistribute content without permission.</li>
+    <li>Use the SAMS logo or branding for commercial purposes.</li>
+  </ul>
+
+  <h2>4. Limitation of Liability</h2>
+  <p>SAMS is provided "as-is". We are not liable for:</p>
+  <ul>
+    <li>Data loss, errors, or interruptions in service.</li>
+    <li>Any damages resulting from misuse of the platform.</li>
+    <li>Third-party content or links included in the platform.</li>
+  </ul>
+
+  <h2>5. Privacy</h2>
+  <p>Your use of the platform is also governed by our <a href="{% url 'privacy'%}">Privacy Policy</a>. We collect and process data in accordance with applicable laws to provide a safe and effective platform experience.</p>
+
+  <h2>6. Modifications to the Service</h2>
+  <p>We may update or modify the platform at any time, including features, functionality, or content. Continued use indicates your acceptance of such changes.</p>
+
+  <h2>7. Termination</h2>
+  <p>We reserve the right to suspend or terminate accounts that violate these Terms of Service without prior notice. Users may also terminate their accounts at any time by contacting support.</p>
+
+  <h2>8. Governing Law</h2>
+  <p>These terms are governed by the laws of India. Any disputes will be resolved under Indian jurisdiction.</p>
+
+  <h2>9. Contact Information</h2>
+  <p>If you have any questions about these Terms of Service, please contact us at <a href="mailto:haisams@gmail.com">haisams@gmail.com</a> or call +91 98765 43210.</p>
+
+  <p class="mt-4">By using SAMS, you acknowledge that you have read, understood, and agree to these Terms of Service.</p>
+</div>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+            <!-- Company Info -->
+            <div class="footer-section company-info">
+                <div class="logo2">SAMS</div>
+                <p class="company-name">Government Polytechnic College,</p>
+                <address>
+                    Nedumangadu, TVM,<br>
+                    Kerala, India - 695xxx
+                </address>
+            </div>
+
+            <!-- Contact & Social -->
+            <div class="footer-section contact-social">
+                <h4 class="contact-heading">Contact</h4>
+                <p class="phone-number">+91 98765 43210</p>
+                <p class="email"><a href="mailto:haisams@gmail.com">haisams@gmail.com</a></p>
+
+                <div class="social-links">
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <p class="copyright">&copy; 2025 SAMS. All rights reserved</p>
+            <div class="legal-links">
+                <a href="{% url 'loader_page' 'terms' %}">Terms of Service</a>
+                <a href="{% url 'loader_page' 'privacy' %}">Privacy Policy</a>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+</footer>
+
+</body>
+</html>

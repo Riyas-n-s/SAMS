@@ -1,0 +1,222 @@
+{% load dict_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Doubts Chat</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body { background: #f8f9fa; }
+#doubt-list { max-height: 520px; overflow-y: auto; background: #fff; border-radius: 0.375rem; border: 1px solid #dee2e6; }
+.doubt-item { cursor: pointer; padding: 12px 16px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; }
+.doubt-item:last-child { border-bottom: none; }
+.doubt-item.active { background-color: #0d6efd; color: white; font-weight: 600; }
+#chat-box { background: #ffffff; border-radius: 0.5rem; box-shadow: 0 0 8px rgb(0 0 0 / 0.1); padding: 16px; height: 400px; overflow-y: auto; font-size: 0.95rem; display: flex; flex-direction: column; }
+#file-preview { font-size: 0.85rem; color: #6c757d; margin-bottom: 8px; }
+#chat-form input[type="text"] { border-radius: 25px; padding-left: 15px; padding-right: 15px; font-size: 1rem; height: 44px; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1); }
+#chat-form button[type="submit"] { background-color: #0d6efd; border: none; color: white; font-size: 1.25rem; width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+#emoji-btn, label[for="file-input"] { background-color: #f8f9fa; border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="container my-4">
+    <div class="topbar">
+      <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+      <a href="{% url 'logout' %}" class="btn btn-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+  </div>
+
+  <div class="row g-4">
+    <!-- Doubt List -->
+    <div class="col-md-4">
+        <h5 class="mb-3">Student Doubts</h5>
+        <ul id="doubt-list" class="list-group">
+            {% for d in doubts %}
+            <li class="list-group-item doubt-item d-flex justify-content-between align-items-center" data-id="{{ d.id }}">
+                <div>
+                    <i class="bi bi-person-circle text-primary"></i>
+                    <b>{{ d.student.username }}</b><br>
+                    <small class="text-muted">{{ d.subject.name }} (Sem {{ d.subject.semester }})</small>
+                </div>
+                {% if unread_counts|dictkey:d.id %}
+                    <span class="badge bg-success rounded-pill">{{ unread_counts|dictkey:d.id }}</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="col-md-8">
+        <div id="chat-box">
+            <p class="text-muted text-center mt-5">Select a doubt to start chatting</p>
+        </div>
+
+        <div id="file-preview" class="mt-1 text-secondary small"></div>
+
+        <form id="chat-form" class="mt-2 d-flex align-items-center position-relative" enctype="multipart/form-data">
+            <button type="button" id="emoji-btn" class="btn btn-light border me-2 rounded-circle">
+                <i class="bi bi-emoji-smile"></i>
+            </button>
+
+            <div id="emoji-picker-container" style="display:none; position:absolute; bottom:60px; left:5px; z-index:1000; background:white; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                <emoji-picker id="emoji-picker"></emoji-picker>
+            </div>
+
+            <label for="file-input" class="btn btn-light border me-2 rounded-circle">
+                <i class="bi bi-paperclip"></i>
+            </label>
+            <input type="file" name="file" id="file-input" class="d-none">
+
+            <input type="text" name="message" id="message-input" class="form-control me-2" placeholder="Type a message">
+
+            <button class="btn btn-success rounded-circle" type="submit" style="width: 45px; height: 45px;">
+                <i class="bi bi-send"></i>
+            </button>
+        </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+
+<script>
+let selectedDoubt = null;
+const chatBox = document.getElementById('chat-box');
+const messageInput = document.getElementById('message-input');
+const fileInput = document.getElementById('file-input');
+const filePreview = document.getElementById('file-preview');
+
+// Render chat message
+function renderMessage(m){
+    let isMine = m.sender === "{{ request.user.username }}";
+    let alignment = isMine ? 'text-end ms-auto bg-success text-white' : 'text-start me-auto bg-light';
+    return `
+        <div class="d-flex mb-2 ${isMine ? 'justify-content-end' : 'justify-content-start'}">
+            <div class="p-2 rounded shadow-sm ${alignment}" style="max-width:75%;">
+                <b>${m.sender}</b>: ${m.message || ''} 
+                ${m.file ? `<br><a href="${m.file}" target="_blank" class="text-warning">📎 File</a>` : ''}
+                <div class="small text-muted">${m.created_at}</div>
+            </div>
+        </div>`;
+}
+
+// Load messages and update badges dynamically
+function loadMessages(){
+    if(!selectedDoubt) return;
+    fetch(`/teacher/messages/${selectedDoubt}/`)
+        .then(res => res.json())
+        .then(data => {
+            // Chat box messages
+            chatBox.innerHTML = data.messages.map(renderMessage).join('');
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Update badges dynamically
+            document.querySelectorAll('.doubt-item').forEach(item=>{
+                const id = item.dataset.id;
+                const count = data.unread_counts[id] || 0;
+                let badge = item.querySelector('.badge');
+                if(count > 0){
+                    if(!badge){
+                        badge = document.createElement('span');
+                        badge.className = 'badge bg-success rounded-pill';
+                        item.appendChild(badge);
+                    }
+                    badge.textContent = count;
+                } else if(badge){
+                    badge.remove();
+                }
+            });
+        });
+}
+
+// Click a doubt to select
+document.querySelectorAll('.doubt-item').forEach(item=>{
+    item.addEventListener('click', function(){
+        selectedDoubt = this.dataset.id;
+        document.querySelectorAll('.doubt-item').forEach(i=>i.classList.remove('active'));
+        this.classList.add('active');
+
+        // Mark as read immediately
+        fetch(`/teacher/mark-read/${selectedDoubt}/`)
+          .then(res=>res.json())
+          .then(data=>{
+              if(data.status === 'ok'){
+                  const badge = this.querySelector('.badge');
+                  if(badge) badge.remove();
+              }
+          });
+
+        loadMessages();
+    });
+});
+
+// Send message
+document.getElementById('chat-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!selectedDoubt){ alert('Select a doubt first'); return; }
+    let formData = new FormData(this);
+    fetch(`/teacher/send-message/${selectedDoubt}/`,{
+        method:'POST',
+        headers:{'X-CSRFToken':'{{ csrf_token }}'},
+        body:formData
+    }).then(res=>res.json()).then(data=>{
+        chatBox.innerHTML += renderMessage(data);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        messageInput.value='';
+        fileInput.value='';
+        filePreview.innerHTML='';
+    });
+});
+
+// File preview
+fileInput.addEventListener('change', ()=>{
+    filePreview.innerHTML = fileInput.files.length ? `Selected: <b>${fileInput.files[0].name}</b>` : '';
+});
+
+// Emoji picker
+const emojiBtn = document.getElementById('emoji-btn');
+const emojiPickerContainer = document.getElementById('emoji-picker-container');
+const emojiPicker = document.getElementById('emoji-picker');
+
+emojiBtn.addEventListener('click', ()=> {
+    emojiPickerContainer.style.display = emojiPickerContainer.style.display==='none'?'block':'none';
+});
+
+emojiPicker.addEventListener('emoji-click', event => {
+    messageInput.value += event.detail.unicode;
+    emojiPickerContainer.style.display='none';
+});
+
+// Refresh messages and badges every 5s
+
+function updateUnreadBadges(){
+    fetch('{% url "teacher_unread_counts" %}')
+    .then(res => res.json())
+    .then(data => {
+        document.querySelectorAll('.doubt-item').forEach(item=>{
+            const id = item.dataset.id;
+            const count = data.unread_counts[id] || 0;
+            let badge = item.querySelector('.badge');
+            if(count > 0){
+                if(!badge){
+                    badge = document.createElement('span');
+                    badge.className = 'badge bg-success rounded-pill';
+                    item.appendChild(badge);
+                }
+                badge.textContent = count;
+            } else if(badge){
+                badge.remove();
+            }
+        });
+    });
+}
+
+// Run every 2 seconds
+setInterval(updateUnreadBadges, 2000);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading SAMS...</title>
+<style>
+body {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background:#f8f9fa;
+    font-family:'Segoe UI', sans-serif;
+}
+
+.loader-text {
+    font-size:4rem;
+    font-weight:bold;
+    color:#ccc;
+    position:relative;
+    display:inline-block;
+    /* Zoom animation starts after fill */
+    animation: zoomIn 0.5s ease-in-out forwards;
+    animation-delay: 2s; /* start after fill completes */
+}
+
+.loader-text::after {
+    content: "SAMS";
+    position:absolute;
+    top:0;
+    left:0;
+    width:0;
+    color:#0d6efd;
+    overflow:hidden;
+    white-space:nowrap;
+    animation: fillText 2s ease-in-out forwards;
+}
+
+/* Color fill animation */
+@keyframes fillText {
+    0% { width:0; }
+    100% { width:100%; }
+}
+
+/* Zoom in animation */
+@keyframes zoomIn {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.5); }
+}
+</style>
+
+<!-- Redirect after 2.5 seconds -->
+<meta http-equiv="refresh" content="2.5;url={% url next_url %}">
+
+</head>
+<body>
+
+<div class="loader-text">SAMS</div>
+
+</body>
+</html>

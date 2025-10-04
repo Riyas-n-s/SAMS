@@ -1,0 +1,368 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CGPA Calculator</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.min.css" rel="stylesheet" />
+
+  <style>
+    body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .container-custom { max-width: 800px; margin-top: 50px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 15px rgb(0 0 0 / 0.1); }
+    h2 { text-align: center; margin-bottom: 30px; color: #34495e; font-weight: 700; }
+    .result-entry { background: #e3f7e3; border-left: 5px solid #28a745; padding: 12px 20px; margin-bottom: 10px; border-radius: 6px; font-weight: 600; color: #155724; display: flex; align-items: center; gap: 10px; }
+    .cgpa-box { background: #d1ecf1; border-left: 5px solid #17a2b8; padding: 18px 24px; font-size: 1.3rem; font-weight: 700; color: #0c5460; border-radius: 8px; margin-top: 25px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 12px; }
+    .table-container { border-radius: 12px; box-shadow: 0 4px 12px rgb(0 0 0 / 0.1); overflow-x: auto; margin-bottom: 1.5rem; }
+    table { min-width: 600px; }
+    thead th { background-color: #cfd3d7 !important; color: #fff; position: sticky; top: 0; z-index: 1; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+    tbody tr:hover { background-color: #ecf0f1; cursor: pointer; }
+    select.form-select { border: 2px solid #ced4da; transition: border-color 0.3s ease; }
+    select.form-select:focus { border-color: #0d6efd; box-shadow: 0 0 8px rgba(13,110,253,0.25); outline: none; }
+    td, th { vertical-align: middle !important; font-size: 1rem; }
+    @media (max-width: 576px) { table { min-width: 100%; } }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="container container-custom d-flex justify-content-between align-items-center mb-4">
+  <a href="{% url 'student_dashboard' %}" class="btn btn-outline-primary">&larr; Back</a>
+  <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+</div>
+
+<!-- Main container -->
+<div class="container container-custom">
+  <h2><i class="bi bi-calculator-fill"></i> SGPA / CGPA Calculator</h2>
+
+  <!-- Branch & Semester selection -->
+  <div class="row g-3 mb-4">
+    <!-- Branch -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Branch:</label>
+      <input type="text" class="form-control" value="{{ profile.branch }}" readonly />
+      <input type="hidden" id="department" value="{{ profile.branch }}" />
+    </div>
+
+    <!-- Semester -->
+    <div class="col-md-6">
+      <label for="semester" class="form-label fw-semibold">Select Semester:</label>
+      <select id="semester" class="form-select">
+        <option value="">-- Select --</option>
+        <option value="Semester 1">Semester 1</option>
+        <option value="Semester 2">Semester 2</option>
+        <option value="Semester 3">Semester 3</option>
+        <option value="Semester 4">Semester 4</option>
+        <option value="Semester 5">Semester 5</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Start button -->
+  <div class="text-center mb-4">
+    <button onclick="startSemester()" class="btn btn-primary btn-lg">
+      <i class="bi bi-arrow-right-circle"></i> Start
+    </button>
+  </div>
+
+  <!-- Subjects & Results -->
+  <div id="subjectsContainer" class="mb-4"></div>
+  <div id="results"></div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
+
+<script>
+const savedResults = {{ saved_results|safe|default:"{}" }};
+console.log("Loaded saved results:", savedResults);
+
+  const gradePoints = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 5, F: 0 };
+
+ const subjectsData = {
+  "CHE": {
+    "Semester 1": [
+      { code: "1001", name: "Commuication Skills in English", credit: 4 },
+      { code: "1002", name: "Mathematics I", credit: 5 },
+      { code: "1003", name: "Applied Physics I", credit: 3 },
+      { code: "1004", name: "Applied Chemistry", credit: 3 },
+      { code: "1005", name: "Engineering Graphics", credit: 1.5 },
+      { code: "2006", name: "Applied Physics Lab", credit: 2 },
+      { code: "1007", name: "Applied Chemistry Lab", credit: 2 },
+      { code: "1008", name: "Introduction to IT systems Lab", credit: 3 },
+      { code: "2009", name: "Engineering Workshop Practice", credit: 3 },
+      { code: "1009", name: "Sports and Yoga", credit: 2 }
+    ],
+    "Semester 2": [
+      { code: "2002", name: "Mathematics II", credit: 4 },
+      { code: "2003", name: "Applied Physics II", credit: 3 },
+      { code: "2001", name: "Environmental Science", credit: 0 },
+      { code: "2031", name: "Fundamentals of Electrical & Electronics Engineering", credit: 3 },
+      { code: "2131", name: "Problem Solving and Programming", credit: 3 },
+      { code: "2008", name: "Communication Skills in English Lab", credit: 1.5 },
+      { code: "2006", name: "Applied Physics Lab", credit: 1 },
+      { code: "2039", name: "Fundamentals of Electrical & Electronics Engineering Lab", credit: 0 },
+      { code: "2139", name: "Problem Solving and Programming Lab", credit: 0 },
+      { code: "2009", name: "Engineering Workshop Practice", credit: 1.5 }
+    ],
+    "Semester 3": [
+      { code: "3009", name: "Internship I", credit: 2 },
+      { code: "3151", name: "Computer System Architecture", credit: 4 },
+      { code: "3132", name: "Programming in C", credit: 3 },
+      { code: "3152", name: "Computer Networks I", credit: 4 },
+      { code: "3134", name: "Digital Computer Fundamentals", credit: 3 },
+      { code: "3135", name: "Programming in C Lab", credit: 1.5 },
+      { code: "3157", name: "System Administration Lab", credit: 1.5 },
+      { code: "3137", name: "Digital Computer Fundamentals Lab", credit: 1.5 },
+      { code: "3158", name: "Computer Hardware Lab I", credit: 1.5 },
+      { code: "3159", name: "Application Development Lab", credit: 0 }
+    ],
+    "Semester 4": [
+      { code: "4131", name: "Object Oriented Programming", credit: 4 },
+      { code: "4151", name: "Computer Networks II", credit: 4 },
+      { code: "4152", name: "Embedded System and Real Time Operating System", credit: 4 },
+      { code: "4001", name: "Community Skills in Indian Knowledge System", credit: 0 },
+      { code: "4136", name: "Object Oriented Programming Lab", credit: 1.5 },
+      { code: "4157", name: "Network Administration Lab I", credit: 1.5 },
+      { code: "4158", name: "Embedded System Lab", credit: 1.5 },
+      { code: "4159", name: "Computer Hardware Lab II", credit: 0 },
+      { code: "4006", name: "Minor Project", credit: 2 }
+    ],
+    "Semester 5": [
+      { code: "5009", name: "Internship II", credit: 3 },
+      { code: "5002", name: "Project Management and Software Engineering", credit: 0 },
+      { code: "5151", name: "Internet of Things", credit: 4 },
+      { code: "5132", name: "Operating System", credit: 4 },
+      { code: "5152A", name: "Web Programming", credit: 4 },
+      { code: "5157", name: "Internet of Things Lab", credit: 1.5 },
+      { code: "5158", name: "Network Administration Lab II", credit: 1.5 },
+      { code: "5159A", name: "Web Programming Lab", credit: 1.5 },
+      { code: "5008", name: "Seminar", credit: 1 }
+    ]
+  },
+
+  "Electronics Engineering": {
+    "Semester 1": [
+      { code: "1001", name: "Commuication Skills in English", credit: 4 },
+      { code: "1002", name: "Mathematics I", credit: 5 },
+      { code: "1003", name: "Applied Physics I", credit: 3 },
+      { code: "1004", name: "Applied Chemistry", credit: 3 },
+      { code: "1005", name: "Engineering Graphics", credit: 1.5 },
+      { code: "2006", name: "Applied Physics Lab", credit: 2 },
+      { code: "1007", name: "Applied Chemistry Lab", credit: 2 },
+      { code: "1008", name: "Introduction to IT systems Lab", credit: 3 },
+      { code: "2009", name: "Engineering Workshop Practice", credit: 3 },
+      { code: "1009", name: "Sports and Yoga", credit: 2 }
+    ],
+    "Semester 2": [
+      { code: "2002", name: "Mathematics II", credit: 4 },
+      { code: "2003", name: "Applied Physics II", credit: 3 },
+      { code: "2001", name: "Environmental Science", credit: 0 },
+      { code: "2031", name: "Fundamentals of Electrical & Electronics Engineering", credit: 3 },
+      { code: "2141", name: "Basic Electronics", credit: 3 },
+      { code: "2008", name: "Communication Skills in English Lab", credit: 1.5 },
+      { code: "2006", name: "Applied Physics Lab", credit: 1 },
+      { code: "2039", name: "Fundamentals of Electrical & Electronics Engineering Lab", credit: 0 },
+      { code: "2149", name: "Electronics Tinkering Workshop", credit: 0 },
+      { code: "2009", name: "Engineering Workshop Practice", credit: 1.5 }
+    ],
+    "Semester 3": [
+      { code: "3009", name: "Internship I", credit: 2 },
+      { code: "3041", name: "Electric Circuits & Networks", credit: 3 },
+      { code: "3042", name: "Principles of Electronic Communication", credit: 3 },
+      { code: "3043", name: "Electronic Circuits", credit: 4 },
+      { code: "3044", name: "Digital Electronics", credit: 4 },
+      { code: "3045", name: "Fundamentals of C Programming", credit: 0 },
+      { code: "3046", name: "Principles of Electronic Communication Lab", credit: 1.5 },
+      { code: "3047", name: "Electronic Circuits Lab", credit: 1.5 },
+      { code: "3048", name: "Digital Electronics Lab", credit: 1.5 },
+      { code: "3049", name: "Fundamentals of C programming Lab", credit: 1.5 }
+    ],
+    "Semester 4": [
+      { code: "4041", name: "Microcontroller and Applications", credit: 4 },
+      { code: "4042", name: "Electronic Measurements and Instrumentation", credit: 4 },
+      { code: "4043", name: "Linear Integrated Circuits", credit: 4 },
+      { code: "4001", name: "Community Skills in Indian Knowledge System", credit: 0 },
+      { code: "4046", name: "Microcontroller and Applications Lab", credit: 1.5 },
+      { code: "4047", name: "Linear Integrated Lab", credit: 1.5 },
+      { code: "4048", name: "PCB and Prototyping Workshop", credit: 1.5 },
+      { code: "4049", name: "Python Programming Lab", credit: 0 },
+      { code: "4009", name: "Minor Project", credit: 2 }
+    ]
+  },
+
+  "CT": {
+    "Semester 1": [
+      { code: "1001", name: "Commuication Skills in English", credit: 4 },
+      { code: "1002", name: "Mathematics I", credit: 5 },
+      { code: "1003", name: "Applied Physics I", credit: 3 },
+      { code: "1004", name: "Applied Chemistry", credit: 3 },
+      { code: "1005", name: "Engineering Graphics", credit: 1.5 },
+      { code: "2006", name: "Applied Physics Lab", credit: 2 },
+      { code: "1007", name: "Applied Chemistry Lab", credit: 2 },
+      { code: "1008", name: "Introduction to IT systems Lab", credit: 3 },
+      { code: "2009", name: "Engineering Workshop Practice", credit: 3 },
+      { code: "1009", name: "Sports and Yoga", credit: 2 }
+    ],
+    "Semester 2": [
+      { code: "2002", name: "Mathematics II", credit: 4 },
+      { code: "2003", name: "Applied Physics II", credit: 3 },
+      { code: "2001", name: "Environmental Science", credit: 0 },
+      { code: "2031", name: "Fundamentals of Electrical & Electronics Engineering", credit: 3 },
+      { code: "2131", name: "Problem Solving and Programming", credit: 3 },
+      { code: "2008", name: "Communication Skills in English Lab", credit: 1.5 },
+      { code: "2006", name: "Applied Physics Lab", credit: 1 },
+      { code: "2039", name: "Fundamentals of Electrical & Electronics Engineering Lab", credit: 0 },
+      { code: "2139", name: "Problem Solving and Programming Lab", credit: 0 },
+      { code: "2009", name: "Engineering Workshop Practice", credit: 1.5 }
+    ],
+    "Semester 3": [
+      { code: "3009", name: "Internship I", credit: 2 },
+      { code: "3131", name: "Computer Organisation", credit: 4 },
+      { code: "3132", name: "Programming in C", credit: 3 },
+      { code: "3133", name: "Database Management System", credit: 3 },
+      { code: "3134", name: "Digital Computer Fundamentals", credit: 3 },
+      { code: "3135", name: "Programming in C Lab", credit: 1.5 },
+      { code: "3136", name: "Database Management System Lab", credit: 1.5 },
+      { code: "3137", name: "Digital Computer Fundamentals Lab", credit: 1.5 },
+      { code: "3138", name: "Web Technology Lab", credit: 2.5 },
+      { code: "3139", name: "Computer System hardware Lab", credit: 0 }
+    ],
+    "Semester 4": [
+      { code: "4131", name: "Object Oriented Programming", credit: 4 },
+      { code: "4132", name: "Computer Communication and Networks", credit: 3 },
+      { code: "4133", name: "Data Structures", credit: 4 },
+      { code: "4001", name: "Community Skills in Indian Knowledge System", credit: 0 },
+      { code: "4136", name: "Object Oriented Programming Lab", credit: 1.5 },
+      { code: "4137", name: "Web Programming Lab", credit: 2.5 },
+      { code: "4138", name: "Data Structures Lab", credit: 1.5 },
+      { code: "4139", name: "Application Development Lab", credit: 0 },
+      { code: "4006", name: "Minor Project", credit: 2 }
+    ]
+  }
+};
+
+
+ window.onload = () => { showResults(); };
+
+
+  async function startSemester() {
+    const dept = document.getElementById("department").value;
+    const sem = document.getElementById("semester").value;
+    const container = document.getElementById("subjectsContainer");
+
+    if(!sem) { await Swal.fire({icon:'warning', title:'Oops!', text:'Please select semester.', timer:2000, showConfirmButton:false}); return; }
+
+    if(!subjectsData[dept] || !subjectsData[dept][sem]) {
+      container.innerHTML = `<p class="text-danger fw-bold">No data found for your department/semester.</p>`;
+      return;
+    }
+
+    const subjects = subjectsData[dept][sem];
+    let html = `<div class="table-container"><table class="table table-striped table-hover align-middle text-center">
+      <thead><tr><th>Code</th><th>Subject</th><th>Credit</th><th>Grade</th></tr></thead><tbody>`;
+    subjects.forEach((subj,index)=>{ html+=`<tr><td>${subj.code}</td><td class="text-start">${subj.name}</td><td>${subj.credit}</td><td><select id="grade_${index}" class="form-select form-select-sm"><option value="">Select</option>${Object.keys(gradePoints).map(g=>`<option value="${g}">${g}</option>`).join('')}</select></td></tr>`; });
+    html+=`</tbody></table></div><div class="d-flex justify-content-center gap-3 mt-3"><button onclick="calculateSGPA('${dept}','${sem}')" class="btn btn-success btn-lg"><i class="bi bi-save"></i> Save SGPA</button></div>`;
+    container.innerHTML = html;
+  }
+
+  async function calculateSGPA(dept, sem) {
+    const subjects = subjectsData[dept][sem];
+    let totalCredits = 0, totalPoints = 0;
+    for (let i = 0; i < subjects.length; i++) {
+        const grade = document.getElementById(`grade_${i}`).value;
+        if (!grade) {
+            await Swal.fire({icon:'error',title:'Incomplete',text:'Please enter all grades.',timer:2000,showConfirmButton:false});
+            return;
+        }
+        totalCredits += subjects[i].credit;
+        totalPoints += subjects[i].credit * gradePoints[grade];
+    }
+    const sgpa = (totalPoints / totalCredits).toFixed(2);
+
+    // Save to backend
+    try {
+        const response = await fetch("{% url 'save_sgpa' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ semester: sem.split(' ')[1], sgpa: sgpa, total_credits: totalCredits })
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message || "Failed to save SGPA");
+
+        // Update front-end results
+        savedResults[`${dept} - ${sem}`] = { sgpa: parseFloat(sgpa), totalCredits };
+        showResults();
+        document.getElementById("subjectsContainer").innerHTML = '';
+        await Swal.fire({icon:'success', title:'Saved!', html:`<b>${sgpa}</b> SGPA saved for ${sem}`, timer:2000, showConfirmButton:false});
+    } catch (err) {
+        Swal.fire({icon:'error', title:'Error', text: err.message});
+    }
+}
+
+
+  function showResults(){
+    const resultsDiv=document.getElementById("results");
+    let html="<h3>Saved Results</h3>"; let totalPoints=0, totalCreditsSum=0;
+    if(Object.keys(savedResults).length===0){ html+=`<p class="text-muted">No saved SGPA yet.</p>`; }
+    else{
+      for(let key in savedResults){
+        const semData=savedResults[key];
+        html+=`<div class="result-entry"><i class="bi bi-journal-check"></i> ${key}: SGPA = <strong>${semData.sgpa}</strong></div>`;
+        totalPoints+=semData.sgpa*semData.totalCredits; totalCreditsSum+=semData.totalCredits;
+      }
+      const cgpa=(totalPoints/totalCreditsSum).toFixed(2);
+      html+=`<div class="cgpa-box"><i class="bi bi-mortarboard-fill"></i>  CGPA: ${cgpa}</div>
+      <div class="mt-3 text-center"><button class="btn btn-warning btn-lg" onclick="clearAllResults()"><i class="bi bi-trash-fill"></i> Clear All Results</button></div>`;
+    }
+    resultsDiv.innerHTML=html;
+  }
+
+  async function clearAllResults() {
+  const { isConfirmed } = await Swal.fire({
+    icon: 'warning',
+    title: 'Clear All Results?',
+    text: 'This will remove all saved SGPA and CGPA data.',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, clear all'
+  });
+
+  if (isConfirmed) {
+    try {
+      // call backend to delete DB records
+      const response = await fetch("{% url 'clear_cgpa' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}"
+        }
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        for (const key in savedResults) delete savedResults[key]; // clear frontend too
+        showResults();
+        Swal.fire({
+          icon: 'success',
+          title: 'Cleared!',
+          text: 'All results have been removed.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Error', text: err.message });
+    }
+  }
+}
+
+</script>
+</body>
+</html>

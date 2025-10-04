@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Doubts Chat</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+
+<style>
+  body { background: #f8f9fa; }
+  #doubt-list { max-height: 520px; overflow-y: auto; background: #fff; border-radius: 0.375rem; border: 1px solid #dee2e6; }
+  .doubt-item { cursor: pointer; padding: 12px 16px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; }
+  .doubt-item:last-child { border-bottom: none; }
+  .doubt-item:hover, .doubt-item.active { background-color: #0d6efd; color: white; font-weight: 600; }
+  .delete-btn { font-size: 0.85rem; color: #dc3545; background: transparent; border: none; cursor: pointer; }
+  .delete-btn:hover { text-decoration: underline; }
+  #chat-box { background: #ffffff; border-radius: 0.5rem; box-shadow: 0 0 8px rgb(0 0 0 / 0.1); padding: 16px; height: 450px; overflow-y: auto; font-size: 0.95rem; display: flex; flex-direction: column; }
+  #chat-box .message { border-radius: 1.25rem; padding: 0.65rem 1.2rem; max-width: 75%; word-wrap: break-word; box-shadow: 0 2px 5px rgb(0 0 0 / 0.05); line-height: 1.3; position: relative; margin-bottom: 0.4rem; }
+  #chat-box .message.mine { background-color: #0d6efd; color: white; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
+  #chat-box .message.theirs { background-color: #f1f3f5; color: #212529; align-self: flex-start; border-bottom-left-radius: 0.25rem; }
+  #chat-box .message small.timestamp { display: block; font-size: 0.75rem; color: #6c757d; margin-top: 0.15rem; }
+  #file-preview { font-size: 0.85rem; color: #6c757d; margin-bottom: 8px; }
+  #chat-form input[type="text"] { border-radius: 25px; padding-left: 15px; padding-right: 15px; font-size: 1rem; height: 44px; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1); }
+  #chat-form button[type="submit"] { background-color: #0d6efd; border: none; color: white; font-size: 1.25rem; width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 6px rgb(13 110 253 / 0.6); transition: background-color 0.3s ease; }
+  #chat-form button[type="submit"]:hover { background-color: #084298; }
+  #emoji-btn, label[for="file-input"] { background-color: #f8f9fa; border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; color: #495057; font-size: 1.3rem; cursor: pointer; transition: background-color 0.3s ease; }
+  #emoji-btn:hover, label[for="file-input"]:hover { background-color: #e2e6ea; }
+</style>
+</head>
+<body>
+<div class="container my-4">
+  <div class="row g-4">
+    <!-- Doubt List -->
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100 d-flex flex-column">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">My Doubts</h5>
+          <button id="delete-chat-global" class="btn btn-sm btn-danger">Delete Chat</button>
+        </div>
+        <ul id="doubt-list" class="list-group list-group-flush flex-grow-1 overflow-auto">
+          {% for d in doubts %}
+            <li class="list-group-item doubt-item" data-id="{{ d.id }}" tabindex="0">
+              <div>
+                <strong>{{ d.subject.name }}</strong><br>
+                <small class="text-muted">{{ d.subject.code }} — Sem {{ d.subject.semester }}</small>
+              </div>
+              <span class="badge bg-danger rounded-pill ms-2 unread-badge" id="badge-{{ d.id }}" style="display:none;">0</span>
+              <button class="delete-btn" data-id="{{ d.id }}" title="Delete Chat"><i class="bi bi-trash"></i></button>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No doubts found.</li>
+          {% endfor %}
+        </ul>
+        <div class="card-body">
+          <h6>Create New Doubt</h6>
+          <select id="subject-select" class="form-select mb-3">
+            {% for s in subjects %}
+              <option value="{{ s.id }}">{{ s.name }} - {{ s.branch }} (Sem {{ s.semester }})</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-primary w-100" id="create-doubt"><i class="bi bi-plus-circle me-1"></i> Create Doubt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="col-md-8 d-flex flex-column" style="height: 650px;">
+      <div class="card shadow-sm flex-grow-1 d-flex flex-column">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Chat</h5>
+        </div>
+        <div id="chat-box" class="flex-grow-1 p-3 d-flex flex-column"></div>
+        <div class="card-footer position-relative">
+          <div id="file-preview" class="mb-2"></div>
+          <form id="chat-form" class="d-flex align-items-center" enctype="multipart/form-data" autocomplete="off" novalidate>
+            <button type="button" id="emoji-btn" class="btn btn-light border me-2 rounded-circle"><i class="bi bi-emoji-smile"></i></button>
+            <label for="file-input" class="btn btn-light border me-2 rounded-circle mb-0" style="cursor:pointer;"><i class="bi bi-paperclip"></i></label>
+            <input type="file" name="file" id="file-input" class="d-none">
+            <input type="text" name="message" id="message-input" class="form-control me-2" placeholder="Type a message" required>
+            <button type="submit" class="btn btn-success rounded-circle d-flex justify-content-center align-items-center" style="width: 45px; height: 45px;" disabled><i class="bi bi-send"></i></button>
+          </form>
+          <div id="emoji-picker-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+let selectedDoubt = null;
+const chatBox = document.getElementById('chat-box');
+const messageInput = document.getElementById('message-input');
+const fileInput = document.getElementById('file-input');
+const filePreview = document.getElementById('file-preview');
+const sendButton = document.querySelector('#chat-form button[type="submit"]');
+const emojiPickerContainer = document.getElementById('emoji-picker-container');
+
+function formatTimestamp(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString([], { hour: '2-digit', minute: '2-digit', hour12: true, day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function renderMessage(m) {
+  const isMine = m.sender === "{{ request.user.username }}";
+  return `<div class="message ${isMine?'mine':'theirs'}">
+    <b>${m.sender}</b>: ${m.message||''}${m.file?`<br><a href="${m.file}" target="_blank" class="text-warning">📎 File</a>`:''}
+    <small class="timestamp">${formatTimestamp(m.created_at)}</small>
+  </div>`;
+}
+
+function scrollBottom() { chatBox.scrollTop = chatBox.scrollHeight; }
+
+// Toggle send button
+function toggleSend() { sendButton.disabled = !(messageInput.value.trim() || fileInput.files.length); }
+messageInput.addEventListener('input', toggleSend);
+fileInput.addEventListener('change', toggleSend);
+toggleSend();
+
+// Load messages
+function loadMessages() {
+  if(!selectedDoubt) return;
+  fetch(`/students/messages/${selectedDoubt}/`)
+    .then(res=>res.json())
+    .then(data=>{
+      chatBox.innerHTML = data.messages.map(renderMessage).join('');
+      scrollBottom();
+    });
+}
+
+// Update badge
+function updateBadge(doubtId, count){
+  const badge = document.getElementById(`badge-${doubtId}`);
+  if(badge) { badge.style.display = count>0?'inline-block':'none'; badge.textContent = count; }
+}
+
+// Poll unread
+function pollUnread(){
+  fetch(`/students/unread-counts/`)
+    .then(res=>res.json())
+    .then(data=>{
+      Object.keys(data).forEach(doubtId=>{
+        if(doubtId != selectedDoubt) updateBadge(doubtId, data[doubtId]);
+      });
+    });
+}
+
+// Click on doubt
+document.querySelectorAll('.doubt-item').forEach(item=>{
+  item.addEventListener('click', function(){
+    selectedDoubt = this.dataset.id;
+    document.querySelectorAll('.doubt-item').forEach(i=>i.classList.remove('active'));
+    this.classList.add('active');
+    updateBadge(selectedDoubt, 0); // clear badge
+    loadMessages();
+    messageInput.focus();
+  });
+});
+
+// Create doubt
+document.getElementById('create-doubt').addEventListener('click', ()=>{
+  const subjectId = document.getElementById('subject-select').value;
+  fetch(`/students/create-doubt/`, {
+    method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}, body: new URLSearchParams({subject_id:subjectId})
+  }).then(res=>res.json()).then(data=>{ if(data.doubt_id) location.reload(); else alert('Error creating doubt'); });
+});
+
+// Send message
+document.getElementById('chat-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  if(!selectedDoubt) return alert('Select a doubt first');
+  const formData = new FormData(e.target);
+  fetch(`/students/send-message/${selectedDoubt}/`, { method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}, body:formData })
+    .then(res=>res.json())
+    .then(data=>{
+      if(data.error) return alert(data.error);
+      chatBox.innerHTML += renderMessage(data);
+      scrollBottom();
+      messageInput.value=''; fileInput.value=''; filePreview.innerHTML=''; toggleSend();
+    });
+});
+
+// File preview cancel
+fileInput.addEventListener('change', ()=>{
+  if(fileInput.files.length){
+    filePreview.innerHTML = `<b>${fileInput.files[0].name}</b> <button type="button" id="cancel-file" class="btn btn-sm btn-outline-danger ms-2"><i class="bi bi-x-circle"></i></button>`;
+    document.getElementById('cancel-file').addEventListener('click', ()=>{ fileInput.value=''; filePreview.innerHTML=''; toggleSend(); });
+  } else filePreview.innerHTML='';
+});
+
+// Emoji picker
+const picker = new EmojiMart.Picker({
+  onEmojiSelect: emoji=>{ messageInput.value+=emoji.native; messageInput.focus(); emojiPickerContainer.style.display='none'; toggleSend(); },
+  theme:'light'
+});
+emojiPickerContainer.appendChild(picker);
+document.getElementById('emoji-btn').addEventListener('click', e=>{ e.preventDefault(); emojiPickerContainer.style.display = emojiPickerContainer.style.display==='none'?'block':'none'; });
+
+// Delete buttons
+document.querySelectorAll('.delete-btn').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const doubtId = btn.dataset.id;
+    if(confirm('Delete this chat?')){
+      fetch(`/students/delete-doubt/${doubtId}/`, { method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'} })
+        .then(res=>res.json()).then(data=>{ if(data.success) location.reload(); else alert('Error deleting chat'); });
+    }
+  });
+});
+
+// Global delete
+document.getElementById('delete-chat-global').addEventListener('click', ()=>{
+  if(!selectedDoubt) return alert('Select a doubt first');
+  if(confirm('Delete all messages in this chat?')){
+    fetch(`/students/delete-doubt/${selectedDoubt}/`, { method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'} })
+      .then(res=>res.json()).then(data=>{ if(data.success) location.reload(); else alert('Error deleting chat'); });
+  }
+});
+
+// Poll unread every 5s
+setInterval(pollUnread, 5000);
+
+function updateChatBadge() {
+    fetch('{% url "student_unread_doubts" %}')
+    .then(res => res.json())
+    .then(data => {
+        const badge = document.getElementById('chat-badge');
+        if (data.unread_count > 0) {
+            badge.textContent = data.unread_count;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    });
+}
+
+updateChatBadge();
+setInterval(updateChatBadge, 3000);
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    function updateChatBadge() {
+        fetch('{% url "student_unread_doubts" %}')
+        .then(res => res.json())
+        .then(data => {
+            const badge = document.getElementById('chat-badge');
+            if (data.unread_count > 0) {
+                badge.textContent = data.unread_count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+    }
+
+    updateChatBadge(); // initial call
+    setInterval(updateChatBadge, 3000); // refresh every 3 sec
+});
+
+ 
+function renderMessage(m) {
+  const isMine = m.sender === "{{ request.user.username }}";
+
+  if (m.is_unsent) {
+    return `<div class="message ${isMine?'mine':'theirs'}" data-id="${m.id}">
+      <i>Message unsent</i>
+      <small class="timestamp">${formatTimestamp(m.created_at)}</small>
+    </div>`;
+  }
+
+  return `<div class="message ${isMine ? 'mine' : 'theirs'}" data-id="${m.id}">
+    <b>${m.sender}</b>: ${m.message || ''} 
+    ${m.file ? `<br><a href="${m.file}" target="_blank" class="text-warning">📎 File</a>` : ''}
+    <small class="timestamp">${formatTimestamp(m.created_at)}</small>
+    ${isMine ? `<button class="btn btn-sm btn-outline-danger unsend-btn" style="position:absolute; top:5px; right:5px; font-size:0.75rem;">x</button>` : ''}
+  </div>`;
+}
+
+
+
+function attachUnsendHandlers() {
+  document.querySelectorAll('.unsend-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const msgId = btn.dataset.id;
+      if (confirm("Unsend this message?")) {
+        fetch(`/students/doubt/unsend/${messageId}/`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } })
+
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "success") {
+            const msgDiv = document.querySelector(`.message[data-id="${msgId}"]`);
+            msgDiv.innerHTML = `<i>This message was unsent</i>`;
+          } else {
+            alert(data.message || "Error unsending message");
+          }
+        });
+      }
+    });
+  });
+}
+
+
+chatBox.addEventListener('click', function(e){
+  if(e.target.classList.contains('unsend-btn')){
+    const messageDiv = e.target.closest('.message');
+    const messageId = messageDiv.dataset.id;
+
+    if(!messageId) return;
+
+    // SweetAlert2 confirmation
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to unsend this message?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, unsend it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if(result.isConfirmed){
+        fetch(`/students/doubt/unsend/${messageId}/`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if(data.status === 'success'){
+            const timestamp = messageDiv.querySelector('.timestamp').outerHTML;
+            messageDiv.innerHTML = `<i>Message unsent</i>${timestamp}`;
+            messageDiv.classList.remove('mine', 'theirs');
+            messageDiv.classList.add('mine'); // optional styling
+
+            Swal.fire('Unsent!', 'Your message has been unsent.', 'success');
+          } else {
+            Swal.fire('Error', data.message || 'Error unsending message', 'error');
+          }
+        }).catch(err => {
+          console.error(err);
+          Swal.fire('Network Error', 'Please try again', 'error');
+        });
+      }
+    });
+  }
+});
+
+
+
+</script>
+</body>
+</html>
+chatBox

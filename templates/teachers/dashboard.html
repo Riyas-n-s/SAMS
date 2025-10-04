@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; color: #333; transition: background 0.3s, color 0.3s; }
+        .dark-mode { background: #121212 !important; color: #fff !important; }
+
+        /* Sidebar */
+        .sidebar { width: 250px; background: #fff; position: fixed; height: 100%; border-right: 1px solid #ddd; padding-top: 60px; transition: width 0.3s; z-index: 1000; }
+        .sidebar.collapsed { width: 70px; }
+        .sidebar a { display: flex; align-items: center; padding: 12px 20px; text-decoration: none; color: #333; transition: 0.3s; }
+        .sidebar a i { width: 25px; }
+        .sidebar a:hover { background: #f1f1f1; }
+        .sidebar.collapsed a span { display: none; }
+        .dark-mode .sidebar { background: #1e1e1e; border-color: #333; }
+        .dark-mode .sidebar a { color: #fff; }
+        .dark-mode .sidebar a:hover { background: #333; }
+
+        /* Topbar */
+        .topbar { height: 60px; background: #fff; position: fixed; top: 0; left: 250px; right: 0; border-bottom: 1px solid #ddd; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; transition: left 0.3s; z-index: 1001; }
+        .sidebar.collapsed ~ .topbar { left: 70px; }
+        .dark-mode .topbar { background: #1e1e1e; border-color: #333; color: #fff; }
+
+        /* Content */
+        .content { margin-left: 250px; padding: 80px 20px 20px; transition: margin-left 0.3s; }
+        .sidebar.collapsed ~ .topbar + .content { margin-left: 70px; }
+
+        /* Dashboard Cards */
+        .dash-card { border-radius: 12px; padding: 20px; text-align: center; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s, background 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+        .dash-card:hover { transform: scale(1.05); background: #f8f9fa; }
+        .dash-card i { font-size: 2rem; margin-bottom: 10px; color: #007bff; }
+        .dark-mode .dash-card { background: #1e1e1e; color: #fff; }
+        .dark-mode .dash-card:hover { background: #222; }
+        .dark-mode .dash-card i { color: #ff9800; }
+
+        /* Profile Dropdown */
+        .profile-dropdown { position: relative; }
+        .profile-dropdown-menu { position: absolute; right: 0; top: 60px; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 10px 0; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .profile-dropdown-menu a { display: block; padding: 8px 20px; color: #333; text-decoration: none; }
+        .profile-dropdown-menu a:hover { background: #f1f1f1; }
+        .profile-dropdown.active .profile-dropdown-menu { display: block; }
+        .dark-mode .profile-dropdown-menu { background: #1e1e1e; border-color: #333; }
+        .dark-mode .profile-dropdown-menu a { color: #fff; }
+        .dark-mode .profile-dropdown-menu a:hover { background: #333; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <a href="#" onclick="toggleSidebar()"><i class="fas fa-bars"></i> <span>Menu</span></a>
+        <a href="{% url 'teacher_dashboard' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+        <a href="{% url 'add_subject' %}"><i class="fas fa-plus"></i> <span>Add Subjects</span></a>
+        <a href="{% url 'teacher_assignments' %}"><i class="fas fa-tasks"></i> <span>Post Assignments</span></a>
+        <a href="{% url 'mark_attendance' %}"><i class="fas fa-calendar-check"></i> <span>Mark Attendance</span></a>
+        <a href="{% url 'teacher_chat' %}"><i class="fas fa-comments"></i> <span>Doubt Clearance</span></a>
+        <a href="{% url 'upload_and_manage_study_material' %}"><i class="fa fa-upload"></i> <span>Upload Study Materials</span></a>
+    </div>
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <h5>Welcome, Teacher</h5>
+        <div class="d-flex align-items-center">
+            <button class="btn btn-sm btn-outline-warning me-3" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" class="rounded-circle" style="width:40px; height:40px; cursor:pointer;" onclick="toggleProfileDropdown()">
+                <div class="profile-dropdown-menu">
+                   <a href="{% url 'teacher_profile' %}">View Profile</a>
+<a href="{% url 'logout' %}">Logout</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <a href="{% url 'teacher_assignments' %}" class="dash-card">
+                    <i class="fas fa-tasks"></i>
+                    <h6>Post Assignments</h6>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'add_subject' %}" class="dash-card">
+                    <i class="fas fa-plus"></i>
+                    <h6>Add Subjects</h6>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'mark_attendance' %}" class="dash-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h6>Mark Attendance</h6>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'teacher_chat' %}" class="dash-card">
+                    <i class="fas fa-comments"></i>
+                    <h6>Student Doubts</h6>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'upload_and_manage_study_material' %}" class="dash-card">
+                    <i class="fa fa-upload"></i>
+                    <h6>Upload Study Materials</h6>
+                </a>
+            </div>
+        </div>
+    </div>
+
+<script>
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+    function toggleProfileDropdown() { document.getElementById('profileDropdown').classList.toggle('active'); }
+    document.addEventListener('click', function(e){ if (!document.getElementById('profileDropdown').contains(e.target)) { document.getElementById('profileDropdown').classList.remove('active'); } });
+</script>
+</body>
+</html>

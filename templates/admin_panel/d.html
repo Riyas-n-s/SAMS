@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <div class="row">
+
+        <!-- Students Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-3">Students</h3>
+                    <a href="{% url 'admin_panel:add_student' %}" class="btn btn-primary mb-2">Add Student</a>
+                    <a href="{% url 'admin_panel:student_list' %}" class="btn btn-secondary mb-2">Manage Students</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-3">Staff</h3>
+                    <a href="{% url 'admin_panel:add_staff' %}" class="btn btn-success mb-2">Add Staff</a>
+                    <a href="{% url 'admin_panel:staff_list' %}" class="btn btn-secondary mb-2">Manage Staff</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

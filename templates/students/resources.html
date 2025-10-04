@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resources</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .category-card {
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+        .badge-upload {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+        .card-body {
+            min-height: 100px;
+        }
+        .link-item a {
+            text-decoration: none;
+        }
+        .link-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="p-4">
+<div class="container">
+
+    <!-- Top bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'student_dashboard' %}" class="btn btn-outline-primary">&larr; Back</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+    </div>
+
+    <h3 class="mb-4">Resources</h3>
+
+    <div class="row g-3">
+
+        <!-- Box 1: Links / Recorded Classes -->
+        <div class="col-md-4">
+            <div class="card category-card shadow-sm" data-bs-toggle="collapse" data-bs-target="#collapse-links">
+                <div class="card-body">
+                    <h5 class="card-title">Links / Recorded Classes</h5>
+                    {% if links|length > 0 %}
+                        <span class="badge bg-danger badge-upload">{{ links|length }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="collapse mt-2" id="collapse-links">
+                <ul class="list-group list-group-flush">
+                    {% for l in links %}
+                    <li class="list-group-item link-item">
+                        {% if l.file %}
+                            <a href="{{ l.file.url }}" target="_blank">{{ l.title }}</a>
+                        {% elif l.link %}
+                            <a href="{{ l.link }}" target="_blank">{{ l.title }}</a>
+                        {% endif %}
+                        <small class="text-muted d-block">Subject: {{ l.subject.name }} | Uploaded: {{ l.uploaded_at|date:"d M Y" }}</small>
+                    </li>
+                    {% endfor %}
+                    {% if links|length == 0 %}
+                        <li class="list-group-item text-muted">No uploads yet.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Box 2: Previous Question Papers -->
+        <div class="col-md-4">
+            <div class="card category-card shadow-sm" data-bs-toggle="collapse" data-bs-target="#collapse-qp">
+                <div class="card-body">
+                    <h5 class="card-title">Previous Question Papers</h5>
+                    {% if previous_quizzes|length > 0 %}
+                        <span class="badge bg-danger badge-upload">{{ previous_quizzes|length }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="collapse mt-2" id="collapse-qp">
+                <ul class="list-group list-group-flush">
+                    {% for q in previous_quizzes %}
+                        <li class="list-group-item link-item">
+                            {% if q.file %}
+                                <a href="{{ q.file.url }}" target="_blank">{{ q.title }}</a>
+                            {% endif %}
+                            <small class="text-muted d-block">Subject: {{ q.subject.name }} | Uploaded: {{ q.uploaded_at|date:"d M Y" }}</small>
+                        </li>
+                    {% endfor %}
+                    {% if previous_quizzes|length == 0 %}
+                        <li class="list-group-item text-muted">No uploads yet.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Box 3: Study Notes -->
+        <div class="col-md-4">
+            <div class="card category-card shadow-sm" data-bs-toggle="collapse" data-bs-target="#collapse-notes">
+                <div class="card-body">
+                    <h5 class="card-title">Study Notes</h5>
+                    {% if study_notes|length > 0 %}
+                        <span class="badge bg-danger badge-upload">{{ study_notes|length }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="collapse mt-2" id="collapse-notes">
+                <ul class="list-group list-group-flush">
+                    {% for n in study_notes %}
+                        <li class="list-group-item link-item">
+                            {% if n.file %}
+                                <a href="{{ n.file.url }}" target="_blank">{{ n.title }}</a>
+                            {% endif %}
+                            <small class="text-muted d-block">Subject: {{ n.subject.name }} | Uploaded: {{ n.uploaded_at|date:"d M Y" }}</small>
+                        </li>
+                    {% endfor %}
+                    {% if study_notes|length == 0 %}
+                        <li class="list-group-item text-muted">No uploads yet.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

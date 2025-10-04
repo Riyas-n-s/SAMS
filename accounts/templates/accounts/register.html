@@ -1,0 +1,319 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { background: linear-gradient(135deg, #f8f9fa, #e9ecef); font-family: 'Segoe UI', sans-serif; }
+        .card { border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); background: white; }
+        h5 { text-align: center; font-weight: 600; margin-bottom: 15px; }
+        .role-card { border: 2px solid #ddd; border-radius: 12px; cursor: pointer; padding: 20px; transition: 0.3s; text-align: center; background: white; }
+        .role-card:hover, .role-card.active { border-color: #ffc107; background: #fffbea; transform: scale(1.05); }
+        .role-card img { width: 60px; margin-bottom: 10px; }
+        .hidden { display: none; }
+        .input-group-text { background: #f1f1f1; border-radius: 8px 0 0 8px; }
+        .form-control { border-radius: 0 8px 8px 0; }
+        #password-strength { height: 6px; border-radius: 4px; background: #ddd; margin-top: 5px; }
+
+        /* Password group box */
+        .password-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: #fafafa;
+        }
+        .password-box label { font-weight: 500; }
+        .toggle-password {
+            cursor: pointer;
+            color: #6c757d;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card shadow-lg p-4" style="max-width: 600px; margin: auto;">
+        <div class="text-center">
+            <img src="{% static 'accounts/images/a.png' %}" alt="User Icon" style="width:90px;">
+            <h3 class="mt-3">Create Your Account</h3>
+            <p class="text-muted">Select your role and complete registration</p>
+        </div>
+
+        {% if error %}
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: '{{ error }}' });
+                });
+            </script>
+        {% endif %}
+        {% if success %}
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        html: '{{ success }}<br><br><a href="{% url "login" %}" class="btn btn-warning">Go to Login</a>',
+                        showConfirmButton: false
+                    });
+                });
+            </script>
+        {% endif %}
+
+        <form method="post" id="registerForm" novalidate>
+            {% csrf_token %}
+            
+            <!-- Step 1: Role Selection -->
+            <h5 class="mt-4 text-center fw-bold">Select Your Role</h5>
+            <div class="d-flex justify-content-center mt-3">
+                <div class="role-card flex-fill mx-1" onclick="selectRole('student')">
+                    <img src="{% static 'accounts/images/student-icon.jpg' %}" alt="Student">
+                    <h6>Student</h6>
+                </div>
+                <div class="role-card flex-fill mx-1" onclick="selectRole('teacher')">
+                    <img src="{% static 'accounts/images/tr-icon.jpg' %}" alt="Teacher">
+                    <h6>Teacher</h6>
+                </div>
+                <div class="role-card flex-fill mx-1" onclick="selectRole('others')">
+                    <img src="{% static 'accounts/images/others-icon.webp' %}" alt="Others">
+                    <h6>Others</h6>
+                </div>
+            </div>
+            <input type="hidden" name="role" id="role" required>
+
+            <!-- Step 2: ID -->
+            <div id="idSection" class="mt-4 hidden">
+                <label for="id_number" class="form-label">Register No / Staff ID</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                    <input type="text" id="id_number" name="id_number" class="form-control" placeholder="Enter your ID">
+                </div>
+            </div>
+
+            <!-- Step 3: Auto-filled Details -->
+            <div id="detailsSection" class="mt-4 hidden">
+                <div class="mb-2">
+                    <label class="form-label">Full Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="name" name="name" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="mb-2 student-field">
+                    <label class="form-label">Branch</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-code-branch"></i></span>
+                        <input type="text" id="branch" name="branch" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="mb-2 student-field">
+                    <label class="form-label">Semester</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-layer-group"></i></span>
+                        <input type="text" id="semester" name="semester" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="mb-2 staff-field">
+                    <label class="form-label">Department</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-building"></i></span>
+                        <input type="text" id="department" name="department" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Credentials -->
+            <div id="credentialsSection" class="mt-4 hidden">
+                <div class="mb-2">
+                    <label class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user-tag"></i></span>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Phone Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                        <input type="text" name="phone" class="form-control" placeholder="Enter phone number (+91...)" required>
+                    </div>
+                </div>
+
+                <!-- Password & Confirm Password Group -->
+                <div class="password-box mt-3">
+                    <label>Password & Confirm Password</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+                        <span class="input-group-text toggle-password" onclick="togglePassword('password')"><i class="fa-solid fa-eye"></i></span>
+                    </div>
+                    <div id="password-strength"></div>
+                    <div class="input-group mt-2">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+                        <span class="input-group-text toggle-password" onclick="togglePassword('confirm_password')"><i class="fa-solid fa-eye"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-warning w-100 mt-3 hidden" id="submitBtn">Register</button>
+        </form>
+    </div>
+</div>
+
+<script>
+let selectedRole = "";
+let detailsFetched = false; // track if already fetched
+
+function selectRole(role) {
+    selectedRole = role;
+    document.getElementById("role").value = role;
+    document.querySelectorAll(".role-card").forEach(card => card.classList.remove("active"));
+    document.querySelector(`.role-card:nth-child(${role === 'student' ? 1 : role === 'teacher' ? 2 : 3})`).classList.add("active");
+    document.getElementById("idSection").classList.remove("hidden");
+    document.getElementById("detailsSection").classList.add("hidden");
+    document.getElementById("credentialsSection").classList.add("hidden");
+    document.getElementById("submitBtn").classList.add("hidden");
+}
+
+// Single fetchDetails function
+function fetchDetails() {
+    let idField = document.getElementById("id_number");
+    let id = idField.value;
+    if (!selectedRole || !id) return;
+
+    // Stop if already fetched with same ID
+    if (detailsFetched && document.getElementById("name").value) return;
+
+    // Show loading
+    Swal.fire({
+        title: 'Fetching...',
+        text: 'Please wait while we get your details.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    fetch(`/get-user-details/?id=${id}&role=${selectedRole}`)
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+
+            if (data.error) {
+                Swal.fire({ icon: 'error', title: 'Not Found', text: data.error });
+                return;
+            }
+
+            detailsFetched = true; // mark as fetched
+
+            // Show sections
+            document.getElementById("detailsSection").classList.remove("hidden");
+            document.getElementById("credentialsSection").classList.remove("hidden");
+            document.getElementById("submitBtn").classList.remove("hidden");
+
+            // Fill fields
+            document.getElementById("name").value = data.name || '';
+            document.getElementById("branch").value = data.branch || '';
+            document.getElementById("semester").value = data.semester || '';
+            document.getElementById("department").value = data.department || '';
+
+            // Make ID readonly
+            idField.readOnly = true;
+
+            // Show/hide fields based on role
+            if (selectedRole === "student") {
+                document.querySelectorAll(".student-field").forEach(f => f.style.display = 'block');
+                document.querySelectorAll(".staff-field").forEach(f => f.style.display = 'none');
+            } else {
+                document.querySelectorAll(".student-field").forEach(f => f.style.display = 'none');
+                document.querySelectorAll(".staff-field").forEach(f => f.style.display = 'block');
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Details Fetched',
+                text: 'We have filled your information automatically.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        });
+}
+
+// Events
+document.getElementById("id_number").addEventListener("blur", fetchDetails);
+document.getElementById("id_number").addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        fetchDetails();
+    }
+});
+
+// Toggle password visibility
+function togglePassword(id) {
+    const field = document.getElementById(id);
+    field.type = field.type === "password" ? "text" : "password";
+}
+
+// Password match validation
+document.getElementById("confirm_password").addEventListener("input", function () {
+    if (this.value !== document.getElementById("password").value) {
+        this.setCustomValidity("Passwords do not match");
+    } else {
+        this.setCustomValidity("");
+    }
+});
+
+// Password strength meter
+document.getElementById("password").addEventListener("input", function () {
+    let strengthBar = document.getElementById("password-strength");
+    let val = this.value;
+    let strength = 0;
+    if (val.match(/[a-z]+/)) strength++;
+    if (val.match(/[A-Z]+/)) strength++;
+    if (val.match(/[0-9]+/)) strength++;
+    if (val.match(/[$@#&!]+/)) strength++;
+    strengthBar.style.width = (strength * 25) + "%";
+    strengthBar.style.background = ["#ddd","#ff4d4d","#ffa500","#28a745","#007bff"][strength];
+});
+
+// Form submit validation
+document.getElementById("registerForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    let password = document.querySelector('input[name="password"]').value;
+    let confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+
+    // Check all required fields
+    let emptyField = false;
+    this.querySelectorAll("input[required]").forEach(input => {
+        if (!input.value.trim()) {
+            emptyField = true;
+        }
+    });
+
+    if (emptyField) {
+        Swal.fire({ icon: 'error', title: 'Missing Fields', text: 'Please fill all required fields.' });
+        return;
+    }
+
+    // Check password match
+    if (password !== confirmPassword) {
+        Swal.fire({ icon: 'error', title: 'Password Mismatch', text: 'Passwords do not match!' });
+        return;
+    }
+
+    this.submit(); // If all good, submit
+});
+</script>
+</body>
+</html>

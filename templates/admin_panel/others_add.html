@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Individual Others Staff</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body { background-color: #f1f3f6; font-family: 'Segoe UI', sans-serif; }
+    .form-card {
+        max-width: 700px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+    .form-card h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+        color: #222;
+    }
+    .input-group .form-control { border-left: none; }
+    .input-group-text { background: #f8f9fa; border-right: none; }
+</style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2><i class="fas fa-user-plus me-2"></i>Add Individual Others Staff</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if existing_staff %}
+    <div class="alert alert-warning">
+        <h5 class="mb-2"><i class="fas fa-exclamation-circle me-1"></i> Others Staff Already Exists</h5>
+        <ul class="mb-0">
+            <li><strong>Name:</strong> {{ existing_staff.name }}</li>
+            <li><strong>Staff ID:</strong> {{ existing_staff.staff_id }}</li>
+            <li><strong>Staff In-Charge:</strong> {{ existing_staff.staff_in_charge }}</li>
+        </ul>
+        <a href="{% url 'admin_panel:manage_all_staff' %}" class="btn btn-outline-dark btn-sm mt-2">
+            <i class="fas fa-eye"></i> View in Manage Staff
+        </a>
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Name -->
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                {{ form.name }}
+            </div>
+            {% for error in form.name.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+
+        <!-- Staff ID -->
+        <div class="mb-3">
+            <label class="form-label">Staff ID</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                {{ form.staff_id }}
+            </div>
+            {% for error in form.staff_id.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+
+        <!-- Staff In-Charge -->
+        <div class="mb-3">
+            <label class="form-label">Staff In-Charge</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                {{ form.staff_in_charge }}
+            </div>
+            {% for error in form.staff_in_charge.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">
+            <i class="fas fa-plus me-1"></i> Add Others Staff
+        </button>
+        <a href="{% url 'admin_panel:manage_all_staff' %}" class="btn btn-secondary w-100 mt-2">
+            Cancel
+        </a>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>No Dues Status</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+        body {
+            background: #f7f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 20px 0;
+        }
+        .container {
+            max-width: 900px;
+        }
+        h2 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #0d6efd;
+            text-align: center;
+        }
+        .alert i {
+            margin-right: 8px;
+        }
+        .card-header {
+            background: #f8d7da;
+            color: #842029;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgb(13 110 253 / 0.1);
+            transition: transform 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-body h5 {
+            font-weight: 600;
+            color: #b02a37;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-body p {
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+        .text-muted {
+            font-size: 0.85rem;
+        }
+        .btn-success {
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.55rem 1.4rem;
+            border-radius: 30px;
+            box-shadow: 0 6px 15px rgb(25 135 84 / 0.3);
+            transition: background-color 0.3s ease;
+        }
+        .btn-success:hover {
+            background-color: #198754cc;
+        }
+        .btn-outline-secondary.disabled {
+            cursor: not-allowed;
+            user-select: none;
+            opacity: 0.45 !important;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.55rem 1.4rem;
+            border-radius: 30px;
+        }
+        .btn-outline-secondary.disabled i {
+            color: #6c757d;
+        }
+        blockquote {
+            max-width: 600px;
+            margin: 1.5rem auto 0 auto;
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'student_dashboard' %}" class="btn btn-outline-primary">
+            &larr; Back
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+            Logout
+        </a>
+    </div>
+<div class="container">
+    <h2>No Dues Status</h2>
+
+    {% if all_cleared %}
+        <div class="alert alert-success" role="alert">
+            <i class="fa fa-check-circle"></i>
+             You have cleared all your dues. No pending dues at this time.
+        </div>
+        <a href="{% url 'download_certificate' %}" class="btn btn-success mb-4">
+            <i class="fa fa-file-download"></i> Download No Dues Clearance Certificate
+        </a>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fa fa-exclamation-triangle"></i>
+             You have some pending dues. Please clear them as soon as possible.
+        </div>
+
+        {% if dues %}
+        <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+            {% for due in dues %}
+            <div class="col">
+                <div class="card border-danger h-100">
+                    <div class="card-header">
+                        <i class="fa fa-exclamation-circle"></i> {{ due.department }}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fa fa-calendar-days"></i> Due Date: {{ due.due_date|date:"d M Y" }}
+                        </h5>
+                        <p class="card-text">{{ due.remark }}</p>
+                        <p class="text-muted mb-0">
+                            Last updated: {{ due.updated_at|date:"d M Y H:i" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="text-center mb-4 text-secondary fst-italic">
+                <i class="fa fa-info-circle"></i> No dues details available to display.
+            </div>
+        {% endif %}
+
+        <a href="#" class="btn btn-outline-secondary disabled mb-3" tabindex="-1" aria-disabled="true" style="pointer-events: none;">
+            <i class="fa fa-file-download"></i> Download No Dues Clearance Certificate
+        </a>
+
+        
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

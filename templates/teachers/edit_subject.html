@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Subject</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { 
+            background: #f4f6f9; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+        .edit-card {
+            max-width: 500px; 
+            margin: 50px auto; 
+            border-radius: 12px; 
+            background: #fff; 
+            padding: 20px 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h3 { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            font-weight: 600;
+        }
+        label { 
+            font-weight: 500; 
+        }
+        .btn-primary {
+            width: 48%;
+            border-radius: 8px;
+        }
+        .btn-secondary {
+            width: 48%;
+            border-radius: 8px;
+        }
+        .btn-group-custom {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="edit-card">
+        <h3>Edit Subject</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>Course Code</label>
+                <input type="text" name="code" value="{{ subject.code }}" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Subject Name</label>
+                <input type="text" name="name" value="{{ subject.name }}" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Semester</label>
+                <select name="semester" class="form-control" required>
+                    {% for i in "12345678" %}
+                        <option value="{{ i }}" {% if subject.semester|stringformat:"s" == i %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label>Branch</label>
+                <input type="text" name="branch" value="{{ subject.branch }}" class="form-control" required>
+            </div>
+            <div class="btn-group-custom">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a href="{% url 'add_subject' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- SweetAlert Messages -->
+    <script>
+    {% if messages %}
+        {% for message in messages %}
+        Swal.fire({
+            icon: '{{ message.tags|escapejs }}' === 'success' ? 'success' : 'error',
+            title: "{{ message|escapejs }}",
+            timer: 2000,
+            showConfirmButton: false
+        });
+        {% endfor %}
+    {% endif %}
+    </script>
+
+</body>
+</html>

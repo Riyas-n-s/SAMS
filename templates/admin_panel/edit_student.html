@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Student</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body { background-color: #f8f9fa; }
+    .card { border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .input-group-text { width: 45px; justify-content: center; }
+    .form-label { font-weight: 500; }
+    .back-btn { margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card p-4 mx-auto" style="max-width: 700px;">
+        <h3 class="mb-4 text-center">Edit Student</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_name">Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" name="name" class="form-control" id="id_name" value="{{ form.name.value|default_if_none:'' }}">
+                    </div>
+                    {% if form.name.errors %}
+                        <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_register_number">Register Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                        <input type="text" name="register_number" class="form-control" id="id_register_number" value="{{ form.register_number.value|default_if_none:'' }}"readonly>
+                    </div>
+                    {% if form.register_number.errors %}
+                        <div class="text-danger small mt-1">{{ form.register_number.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_branch">Branch</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
+                        <input type="text" name="branch" class="form-control" id="id_branch" value="{{ form.branch.value|default_if_none:'' }}">
+                    </div>
+                    {% if form.branch.errors %}
+                        <div class="text-danger small mt-1">{{ form.branch.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_semester">Semester</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                        <input type="number" name="semester" class="form-control" id="id_semester" value="{{ form.semester.value|default_if_none:'' }}">
+                    </div>
+                    {% if form.semester.errors %}
+                        <div class="text-danger small mt-1">{{ form.semester.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_roll_number">Roll Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
+                        <input type="number" name="roll_number" class="form-control" id="id_roll_number" value="{{ form.roll_number.value|default_if_none:'' }}">
+                    </div>
+                    {% if form.roll_number.errors %}
+                        <div class="text-danger small mt-1">{{ form.roll_number.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Save</button>
+                <a href="{% url 'admin_panel:admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
