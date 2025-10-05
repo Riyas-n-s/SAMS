@@ -92,7 +92,7 @@ STATIC_URL = '/static/'
 # Where Django looks for additional static files in your apps
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR / "accounts" / "static",  # your app-level static folder
+   
 ]
 
 # Where Django collects all static files for production
