@@ -16,7 +16,7 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "sams.onrender.com",  # 👈 your Render app URL
+    "sams-s54g.onrender.com"  # 👈 your Render app URL
 ] 
 # Applications
 INSTALLED_APPS = [
