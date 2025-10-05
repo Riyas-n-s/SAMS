@@ -86,10 +86,17 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# Static files (CSS, JS, images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "accounts" / "static", ]
+
+# Where Django looks for additional static files in your apps
+STATICFILES_DIRS = [
+    BASE_DIR / "accounts" / "static",  # your app-level static folder
+]
+
+# Where Django collects all static files for production
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Media files
 MEDIA_URL = '/media/'
