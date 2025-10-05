@@ -10,12 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = os.getenv("DEBUG") == "True"
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# Allowed hosts
-# Example: ALLOWED_HOSTS=sams.onrender.com
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
-
+# Add your Render domain exactly as it appears
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "sams-6m9i.onrender.com",  # 👈 your Render app URL
+] 
 # Applications
 INSTALLED_APPS = [
     'django.contrib.admin',
