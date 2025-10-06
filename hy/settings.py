@@ -2,6 +2,9 @@
 Django settings for hy project.
 Production-ready for Render deployment.
 """
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 from pathlib import Path
 
