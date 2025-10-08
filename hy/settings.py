@@ -111,9 +111,9 @@ INSTALLED_APPS += [
 ]
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dzygliw9r',   # replace with your Cloudinary cloud name
-    'API_KEY': '799653353572865',         # replace with your Cloudinary API key
-    'API_SECRET': 'X10WtL2bs0MGML5M6tZGm4CbycU',   # replace with your Cloudinary API secret
+    'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_SECRET'),
 }
 
 # Tell Django to use Cloudinary for all uploaded files
@@ -121,6 +121,7 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # MEDIA_URL can remain as-is for templates
 MEDIA_URL = '/media/'
+
 
 # Default primary key field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
