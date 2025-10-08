@@ -105,10 +105,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # Media files - Cloudinary setup
-INSTALLED_APPS += [
-    'cloudinary',
-    'cloudinary_storage',
-]
+
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
