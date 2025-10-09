@@ -410,34 +410,119 @@ div.navbar-center img {
       margin: 0 auto 30px;
       border-radius: 2px;
     }
+
+
+
+    div.navbar-center img {
+    margin-left: 0;
+    margin-top: 0;
+    height: 70px;
+    width: 70px;
+}
+
+.navbar-left{
+
+  font-size:24px;
+  margin-left: 25px;
+   font-weight:700;
+  color:#101c3f;
+}
+
+/* Header Flex Adjustments for mobile */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        padding: 15px 20px;
+    }
+
+    .navbar-left {
+        font-size: 22px;
+        margin-bottom: 10px;
+        margin-left:0;
+    }
+
+    .navbar-center img {
+        height: 60px;
+        width: 60px;
+        margin-bottom: 10px;
+    }
+
+    .navbar-right {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .navbar-right a {
+        margin: 5px 10px;
+        font-size: 16px;
+    }
+
+    /* Hero Section: Stack content vertically */
+    .hero-features-wrapper {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .hero-content, .hero-illustration {
+        max-width: 100%;
+    }
+
+    .hero-illustration img {
+        max-width: 90%;
+        margin: 20px auto 0 auto;
+    }
+
+    .hero-content h1 {
+        font-size: 6vw; /* scales better on mobile */
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+    }
+
+    .cta-button {
+        padding: 12px 25px;
+        font-size: 14px;
+    }
+}
+
+/* Optional: Smooth hero image animation scaling */
+.hero-illustration img {
+    animation: zoomPulse 6s ease-in-out infinite;
+}
+
+@keyframes zoomPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
 </style>
+
+
+<link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg" />
+
+
 </head>
 
 <body>
 
-<header class="navbar" style="display:flex; align-items:center; justify-content:space-between; padding:10px 20px;">
-    
-    <!-- Left side: SAM text -->
-    <div class="navbar-left" style="font-size:24px; font-weight:700; color:#101c3f;">
-        SAMS
-    </div>
-
-    <!-- Center: Logo -->
+<header class="navbar">
+    <div class="navbar-left">SAMS</div>
     <div class="navbar-center">
-        <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg" alt="Logo">
-
+        <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg" alt="SAMS Logo">
     </div>
-
-    <!-- Right side: navigation links -->
     <nav class="navbar-right">
         <a href="{% url 'loader_page' 'home' %}">Home</a>
         <a href="{% url 'loader_page' 'about' %}">About</a>
         <a href="{% url 'loader_page' 'contact' %}">Contact</a>
-        <!-- FAQ removed -->
     </nav>
-
 </header>
-
 
 <section class="hero-features-section">
     <div class="hero-features-wrapper">
@@ -447,10 +532,11 @@ div.navbar-center img {
             <a href="{% url 'loader_page' 'login' %}" class="cta-button">Get Started</a>
         </div>
         <div class="hero-illustration scroll-animate" data-animate="fade-right">
-            <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/first.0.2.jpeg" alt="First Image">
-
+            <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/first.0.2.jpeg" alt="LMS Illustration">
         </div>
     </div>
+</section>
+
 
     <div class="features-wrapper">
         <div class="feature-card scroll-animate" data-animate="fade-up">

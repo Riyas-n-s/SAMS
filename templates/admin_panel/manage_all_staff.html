@@ -1,25 +1,109 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Manage Staff</title>
-
-<!-- Local Bootstrap CSS -->
-<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-
 <style>
-    body { background-color: #f8f9fa; }
-    .card { border-radius: 1rem; }
+/* Simple desktop-only styles */
+
+body {
+    background-color: #f8f9fa;
+    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 900px;
+    margin: 40px auto;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 1rem;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+input.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    font-size: 14px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.table th,
+.table td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: left;
+}
+
+.table th {
+    background-color: #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.btn {
+    display: inline-block;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-3 {
+    margin-bottom: 15px;
+    font-size:20px;
+}
+
+.mb-4 {
+    margin-bottom: 20px;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
 </style>
 </head>
 <body>
 
-<div class="container mt-4">
+<div class="container">
     <h2 class="mb-4 text-center">Manage Staff</h2>
 
-    <div class="card shadow-sm p-4">
+    <div class="card shadow-sm">
         <div class="mb-3">
             <input type="text" id="staffSearch" class="form-control" placeholder="Search by Staff ID">
         </div>
@@ -27,80 +111,72 @@
         <!-- Staff Table -->
         <div id="staffTableWrapper">
             <h5 class="mb-3">Staffs</h5>
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover align-middle" id="staffTable">
-                    <thead class="table-secondary">
-                        <tr>
-                            <th>Name</th>
-                            <th>Staff ID</th>
-                            <th>Department</th>
-                            <th>Manage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for staff in staffs %}
-                        <tr>
-                            <td>{{ staff.name }}</td>
-                            <td class="staff-id">{{ staff.staff_id }}</td>
-                            <td>{{ staff.department }}</td>
-                            <td>
-                                <a href="{% url 'admin_panel:edit_staff' staff.id %}" class="btn btn-sm btn-warning">Edit</a>
-                                <button class="btn btn-sm btn-danger delete-btn" 
-                                        data-url="{% url 'admin_panel:delete_staff' staff.id %}"
-                                        data-name="{{ staff.name }}">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4" class="text-center">No staff found.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <table class="table table-hover" id="staffTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Staff ID</th>
+                        <th>Department</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in staffs %}
+                    <tr>
+                        <td>{{ staff.name }}</td>
+                        <td class="staff-id">{{ staff.staff_id }}</td>
+                        <td>{{ staff.department }}</td>
+                        <td>
+                            <a href="{% url 'admin_panel:edit_staff' staff.id %}" class="btn btn-warning">Edit</a>
+                            <button class="btn btn-danger delete-btn" 
+                                    data-url="{% url 'admin_panel:delete_staff' staff.id %}"
+                                    data-name="{{ staff.name }}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">No staff found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         <!-- Other Staff Table -->
         <div id="othersTableWrapper">
             <h5 class="mb-3">Other Staffs</h5>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle" id="othersTable">
-                    <thead class="table-secondary">
-                        <tr>
-                            <th>Name</th>
-                            <th>Staff ID</th>
-                            <th>Staff In-Charge</th>
-                            <th>Manage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for other in others_staffs %}
-                        <tr>
-                            <td>{{ other.name }}</td>
-                            <td class="staff-id">{{ other.staff_id }}</td>
-                            <td>{{ other.staff_in_charge }}</td>
-                            <td>
-                                <a href="{% url 'admin_panel:edit_others_staff' other.id %}" class="btn btn-sm btn-warning">Edit</a>
-                                <button class="btn btn-sm btn-danger delete-btn" 
-                                        data-url="{% url 'admin_panel:delete_others_staff' other.id %}"
-                                        data-name="{{ other.name }}">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4" class="text-center">No other staff found.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <table class="table table-hover" id="othersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Staff ID</th>
+                        <th>Staff In-Charge</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for other in others_staffs %}
+                    <tr>
+                        <td>{{ other.name }}</td>
+                        <td class="staff-id">{{ other.staff_id }}</td>
+                        <td>{{ other.staff_in_charge }}</td>
+                        <td>
+                            <a href="{% url 'admin_panel:edit_others_staff' other.id %}" class="btn btn-warning">Edit</a>
+                            <button class="btn btn-danger delete-btn" 
+                                    data-url="{% url 'admin_panel:delete_others_staff' other.id %}"
+                                    data-name="{{ other.name }}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">No other staff found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-
-
-<!-- Local Bootstrap JS -->
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
 <script>
 // Search filter
@@ -109,13 +185,11 @@ document.getElementById('staffSearch').addEventListener('keyup', function () {
     let staffRows = document.querySelectorAll('#staffTable tbody tr');
     let otherRows = document.querySelectorAll('#othersTable tbody tr');
 
-    // Filter Staff Table
     staffRows.forEach(row => {
         let id = row.querySelector('.staff-id')?.textContent.toLowerCase() || '';
         row.style.display = (id.includes(value) || value === '') ? '' : 'none';
     });
 
-    // Filter Other Staff Table
     otherRows.forEach(row => {
         let id = row.querySelector('.staff-id')?.textContent.toLowerCase() || '';
         row.style.display = (id.includes(value) || value === '') ? '' : 'none';
@@ -126,11 +200,10 @@ document.getElementById('staffSearch').addEventListener('keyup', function () {
 document.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.preventDefault();
-        const url = this.dataset.url;  // Get the URL from data-url
-        window.location.href = url;    // Redirect immediately
+        const url = this.dataset.url;
+        window.location.href = url;
     });
 });
-    
 </script>
 
 </body>
