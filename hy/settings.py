@@ -19,8 +19,13 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "sams-s54g.onrender.com"  # 👈 your Render app URL
-] 
+    "sams-s54g.onrender.com",
+    "samss.work.gd",
+    "www.samss.work.gd"
+]
+
+
+SECURE_SSL_REDIRECT = True
 # Applications
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -129,6 +134,6 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_VERIFY_SID = os.getenv("TWILIO_VERIFY_SID")
 
 # Security settings (optional, recommended)
-SECURE_SSL_REDIRECT = not DEBUG
+
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
