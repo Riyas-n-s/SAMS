@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "sams-s54g.onrender.com",
     "samss.work.gd",
-    "www.samss.work.gd"
+    "gpc.samss.work.gd"
 ]
 
 
