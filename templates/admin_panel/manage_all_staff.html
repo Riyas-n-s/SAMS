@@ -1,165 +1,117 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Manage Staff</title>
-
-<!-- Bootstrap & Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-body {
-    min-height: 100vh;
-    background: radial-gradient(circle at 20% 20%, #4f46e5, transparent 60%),
-                radial-gradient(circle at 80% 30%, #22d3ee, transparent 60%),
-                radial-gradient(circle at 50% 80%, #9333ea, transparent 60%),
-                #030712;
-    background-size: 200% 200%;
-    animation: bgMove 8s infinite linear;
-    color: white;
-    font-family: "Segoe UI", sans-serif;
-}
+/* Simple desktop-only styles */
 
-@keyframes bgMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+body {
+    background-color: #f8f9fa;
+    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
-    max-width: 1100px;
-    margin: 50px auto;
+    width: 900px;
+    margin: 40px auto;
 }
 
-.glass-card {
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(14px);
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.25);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    padding: 30px;
-}
-
-h2, h5 {
-    font-weight: 800;
+h2 {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
-.form-control {
-    background: rgba(0,0,0,0.45);
-    border: 1px solid rgba(255,255,255,0.35);
-    color: white;
+.card {
+    background-color: #fff;
+    border-radius: 1rem;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.form-control::placeholder {
-    color: #ccc;
+input.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    font-size: 14px;
 }
 
-.form-control:focus {
-    background: rgba(0,0,0,0.6);
-    color: white;
-    border-color: #22d3ee;
-    box-shadow: 0 0 12px #22d3ee;
-}
-
-/* ✅ FULL DARK MODE FIX FOR TABLE */
 .table {
-    --bs-table-bg: rgba(2, 6, 23, 0.95) !important;
-    --bs-table-striped-color: #fff !important;
-    --bs-table-color: #fff !important;
-    background-color: rgba(2, 6, 23, 0.95) !important;
-    color: #ffffff !important;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
 }
 
-.table tbody tr,
-.table tbody td {
-    background-color: rgba(2, 6, 23, 0.95) !important;
-    color: #ffffff !important;
+.table th,
+.table td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: left;
 }
 
-.table thead th {
-    background: linear-gradient(135deg, #1e3a8a, #0ea5e9) !important;
-    color: #ffffff !important;
+.table th {
+    background-color: #e9ecef;
 }
 
-/* ===== BUTTONS ===== */
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
 .btn {
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 600;
+    display: inline-block;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
 }
 
 .btn-warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border: none;
-    color: black;
+    background-color: #ffc107;
+    color: #212529;
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
-    border: none;
-    box-shadow: 0 0 12px rgba(248,113,113,0.8);
-    color: white;
+    background-color: #dc3545;
+    color: #fff;
 }
 
-.btn-danger:hover {
-    transform: scale(1.05);
-}
-
-.section-title {
+.text-center {
     text-align: center;
-    font-size: 20px;
-    margin: 30px 0 15px;
 }
 
-/* ✅ Search Dark */
-#staffSearch {
-    background: rgba(2, 6, 23, 0.8) !important;
-    color: white !important;
-    border: 1px solid rgba(255,255,255,0.3) !important;
+.mb-3 {
+    margin-bottom: 15px;
+    font-size:20px;
 }
 
-/* ✅ TOP BUTTON BAR */
-.top-bar {
-    display: flex;
-    justify-content: space-between;
+.mb-4 {
     margin-bottom: 20px;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 </style>
 </head>
-
 <body>
 
 <div class="container">
+    <h2 class="mb-4 text-center">Manage Staff</h2>
 
-    <!-- ✅ TOP BUTTON BAR -->
-    <div class="top-bar">
-        <a href="javascript:history.back()" class="btn btn-primary btn-sm">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
-
-        <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
-    </div>
-
-    <h2>Manage Staff</h2>
-
-    <div class="glass-card">
-
-        <!-- SEARCH -->
+    <div class="card shadow-sm">
         <div class="mb-3">
             <input type="text" id="staffSearch" class="form-control" placeholder="Search by Staff ID">
         </div>
 
-        <!-- ================= STAFF TABLE ================= -->
-        <h5 class="section-title">Teaching Staff</h5>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
+        <!-- Staff Table -->
+        <div id="staffTableWrapper">
+            <h5 class="mb-3">Staffs</h5>
+            <table class="table table-hover" id="staffTable">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -175,12 +127,12 @@ h2, h5 {
                         <td class="staff-id">{{ staff.staff_id }}</td>
                         <td>{{ staff.department }}</td>
                         <td>
-                            <a href="{% url 'admin_panel:edit_staff' staff.id %}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <a href="{% url 'admin_panel:delete_staff' staff.id %}" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i> Delete
-                            </a>
+                            <a href="{% url 'admin_panel:edit_staff' staff.id %}" class="btn btn-warning">Edit</a>
+                            <button class="btn btn-danger delete-btn" 
+                                    data-url="{% url 'admin_panel:delete_staff' staff.id %}"
+                                    data-name="{{ staff.name }}">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                     {% empty %}
@@ -190,10 +142,10 @@ h2, h5 {
             </table>
         </div>
 
-        <!-- ================= OTHER STAFF TABLE ================= -->
-        <h5 class="section-title mt-5">Department / Other Staff</h5>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
+        <!-- Other Staff Table -->
+        <div id="othersTableWrapper">
+            <h5 class="mb-3">Other Staffs</h5>
+            <table class="table table-hover" id="othersTable">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -209,12 +161,12 @@ h2, h5 {
                         <td class="staff-id">{{ other.staff_id }}</td>
                         <td>{{ other.staff_in_charge }}</td>
                         <td>
-                            <a href="{% url 'admin_panel:edit_others_staff' other.id %}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <a href="{% url 'admin_panel:delete_others_staff' other.id %}" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i> Delete
-                            </a>
+                            <a href="{% url 'admin_panel:edit_others_staff' other.id %}" class="btn btn-warning">Edit</a>
+                            <button class="btn btn-danger delete-btn" 
+                                    data-url="{% url 'admin_panel:delete_others_staff' other.id %}"
+                                    data-name="{{ other.name }}">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                     {% empty %}
@@ -223,18 +175,33 @@ h2, h5 {
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
 <script>
+// Search filter
 document.getElementById('staffSearch').addEventListener('keyup', function () {
     let value = this.value.toLowerCase();
-    let staffRows = document.querySelectorAll('tbody tr');
+    let staffRows = document.querySelectorAll('#staffTable tbody tr');
+    let otherRows = document.querySelectorAll('#othersTable tbody tr');
 
     staffRows.forEach(row => {
         let id = row.querySelector('.staff-id')?.textContent.toLowerCase() || '';
-        row.style.display = id.includes(value) ? '' : 'none';
+        row.style.display = (id.includes(value) || value === '') ? '' : 'none';
+    });
+
+    otherRows.forEach(row => {
+        let id = row.querySelector('.staff-id')?.textContent.toLowerCase() || '';
+        row.style.display = (id.includes(value) || value === '') ? '' : 'none';
+    });
+});
+
+// Delete button click
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const url = this.dataset.url;
+        window.location.href = url;
     });
 });
 </script>
