@@ -93,138 +93,7 @@ def set_new_password(request):
     return render(request, "accounts/set_new_password.html")
 
 # --- Registration ---
-##def register(request):
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        email = request.POST.get('email')
-        role = request.POST.get('role')
-        id_number = request.POST.get('id_number')
-        phone = request.POST.get('phone')
 
-        if password != confirm_password:
-            return render(request, 'accounts/register.html', {'error': 'Passwords do not match'})
-
-        if User.objects.filter(username=username).exists():
-            return render(request, 'accounts/register.html', {'error': 'Username already exists'})
-
-        name = branch = department = semester = None
-        if role == "student":
-            # Get details from Profile directly (no Student model now)
-            try:
-                existing_profile = Profile.objects.get(register_number=id_number, role="student")
-                name = existing_profile.name
-                branch = existing_profile.branch
-                semester = existing_profile.semester
-            except Profile.DoesNotExist:
-                return render(request, 'accounts/register.html', {'error': 'Student record not found'})
-        elif role in ["teacher", "others"]:
-            try:
-                staff = Staff.objects.get(staff_id=id_number)
-                name = staff.name
-                department = staff.department
-            except Staff.DoesNotExist:
-                return render(request, 'accounts/register.html', {'error': 'Staff record not found'})
-        elif role == "admin":
-            name = "Administrator"
-
-        user = User.objects.create_user(username=username, password=password, email=email)
-        profile = user.profile
-        profile.role = role
-        profile.name = name
-        profile.phone = phone
-        profile.register_number = id_number if role == "student" else None
-        profile.staff_id = id_number if role in ["teacher", "others"] else None
-        profile.branch = branch
-        profile.department = department
-        profile.semester = semester
-        profile.save()
-
-        messages.success(request, "Registration successful! Please log in.")
-        return redirect('login')
-
-    return render(request, 'accounts/register.html')
-##def register(request):
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        email = request.POST.get('email')
-        role = request.POST.get('role')
-        id_number = request.POST.get('id_number')
-        phone = request.POST.get('phone')
-        name = request.POST.get('name')
-        branch = request.POST.get('branch')
-        semester = request.POST.get('semester')
-        department = request.POST.get('department')
-
-        # Password check
-        if password != confirm_password:
-            return render(request, 'accounts/register.html', {'error': 'Passwords do not match'})
-
-        # Username check
-        if User.objects.filter(username=username).exists():
-            return render(request, 'accounts/register.html', {'error': 'Username already exists'})
-
-        # Handle student
-        if role == "student":
-            student, created = Student.objects.get_or_create(
-                register_number=id_number,
-                defaults={'name': name, 'branch': branch, 'semester': semester}
-            )
-            if not created:
-                student.name = name
-                student.branch = branch
-                student.semester = semester
-                student.save()
-            branch = student.branch
-            semester = student.semester
-
-        # Handle teacher staff
-        elif role == "teacher":
-            staff, created = Staff.objects.get_or_create(
-                staff_id=id_number,
-                defaults={'name': name, 'department': department}
-            )
-            if not created:
-                staff.name = name
-                staff.department = department
-                staff.save()
-            department = staff.department
-
-        # Handle others staff
-        elif role == "others":
-            other_staff, created = OthersStaff.objects.get_or_create(
-                staff_id=id_number,
-                defaults={'name': name, 'staff_in_charge': department}  # Use 'department' field for staff_in_charge
-            )
-            if not created:
-                other_staff.name = name
-                other_staff.staff_in_charge = department
-                other_staff.save()
-            department = other_staff.staff_in_charge # or keep as you wish
-
-        elif role == "admin":
-            name = "Administrator"
-
-        # Create user and profile
-        user = User.objects.create_user(username=username, password=password, email=email)
-        profile = user.profile
-        profile.role = role
-        profile.name = name
-        profile.phone = phone
-        profile.register_number = id_number if role == "student" else None
-        profile.staff_id = id_number if role in ["teacher", "others"] else None
-        profile.branch = branch if role == "student" else None
-        profile.department = department if role ==["teacher", "others"]else None
-        profile.semester = semester if role == "student" else None
-        profile.save()
-
-        messages.success(request, "Registration successful! Please log in.")
-        return redirect('login')
-
-    return render(request, 'accounts/register.html')
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from accounts.models import Student, Staff, OthersStaff, Profile
@@ -252,7 +121,10 @@ def register(request):
             return render(request, 'accounts/register.html', {'error': 'User already registered!'})
 
         # Save into Profile table
-        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists!")
+            
+
         user = User.objects.create_user(username=username, password=password, email=email)
         profile = user.profile
         profile.role = role
@@ -436,3 +308,19 @@ def loader_page(request, next_url):
         'next_url': next_url
     }
     return render(request, 'accounts/loader.html', context)
+
+
+def csrf_failure(request, reason=""):
+    return render(request, 'accounts/403_csrf.html')
+
+
+
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+
+def check_username(request):
+    username = request.GET.get("username", None)
+
+    if username and User.objects.filter(username=username).exists():
+        return JsonResponse({"exists": True})
+    return JsonResponse({"exists": False})

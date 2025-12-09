@@ -38,8 +38,7 @@
 <div class="container mt-5">
     <div class="card shadow-lg p-4" style="max-width: 600px; margin: auto;">
         <div class="text-center">
-            <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/a.png" alt="User Icon" style="width:90px;">
-
+            <img src="{% static 'accounts/images/a.png' %}" alt="User Icon" style="width:90px;">
             <h3 class="mt-3">Create Your Account</h3>
             <p class="text-muted">Select your role and complete registration</p>
         </div>
@@ -71,18 +70,15 @@
             <h5 class="mt-4 text-center fw-bold">Select Your Role</h5>
             <div class="d-flex justify-content-center mt-3">
                 <div class="role-card flex-fill mx-1" onclick="selectRole('student')">
-                    <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/student-icon.jpg" alt="Student Icon">
-
+                    <img src="{% static 'accounts/images/student-icon.jpg' %}" alt="Student">
                     <h6>Student</h6>
                 </div>
                 <div class="role-card flex-fill mx-1" onclick="selectRole('teacher')">
-                   <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/tr-icon.jpg" alt="teacher Icon">
-
+                    <img src="{% static 'accounts/images/tr-icon.jpg' %}" alt="Teacher">
                     <h6>Teacher</h6>
                 </div>
                 <div class="role-card flex-fill mx-1" onclick="selectRole('others')">
-                    <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/others-icon.webp" alt="others Icon">
-
+                    <img src="{% static 'accounts/images/others-icon.webp' %}" alt="Others">
                     <h6>Others</h6>
                 </div>
             </div>
@@ -130,45 +126,77 @@
             </div>
 
             <!-- Step 4: Credentials -->
-            <div id="credentialsSection" class="mt-4 hidden">
-                <div class="mb-2">
-                    <label class="form-label">Username</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa-solid fa-user-tag"></i></span>
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required>
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Email</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Phone Number</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                        <input type="text" name="phone" class="form-control" placeholder="Enter phone number (+91...)" required>
-                    </div>
-                </div>
+           <!-- Step 4: Credentials -->
+<div id="credentialsSection" class="mt-4 hidden">
 
-                <!-- Password & Confirm Password Group -->
-                <div class="password-box mt-3">
-                    <label>Password & Confirm Password</label>
-                    <div class="input-group mb-2">
-                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
-                        <span class="input-group-text toggle-password" onclick="togglePassword('password')"><i class="fa-solid fa-eye"></i></span>
-                    </div>
-                    <div id="password-strength"></div>
-                    <div class="input-group mt-2">
-                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
-                        <span class="input-group-text toggle-password" onclick="togglePassword('confirm_password')"><i class="fa-solid fa-eye"></i></span>
-                    </div>
-                </div>
-            </div>
+    <div class="mb-2">
+        <label class="form-label">Username</label>
+        <div class="input-group">
+            <span class="input-group-text">
+                <i class="fa-solid fa-user-tag"></i>
+            </span>
+            <input type="text" id="username" name="username"
+                   class="form-control"
+                   placeholder="Choose a username"
+                   required>
+        </div>
+
+        <!-- ✅ Live error message -->
+        <small id="usernameError" class="text-danger d-none">
+            Username already exists!
+        </small>
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label">Email</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+            <input type="email" name="email" class="form-control"
+                   placeholder="Enter your email" required>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label">Phone Number</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+            <input type="text" name="phone" class="form-control"
+                   placeholder="Enter phone number (+91...)"
+                   value="+91" required>
+        </div>
+    </div>
+
+    <!-- Password & Confirm Password Group -->
+    <div class="password-box mt-3">
+        <label>Password & Confirm Password</label>
+
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+            <input type="password" id="password" name="password"
+                   class="form-control" placeholder="Enter password" required>
+            <span class="input-group-text toggle-password"
+                  onclick="togglePassword('password')">
+                <i class="fa-solid fa-eye"></i>
+            </span>
+        </div>
+
+        <div id="password-strength"></div>
+
+        <div class="input-group mt-2">
+            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+            <input type="password" id="confirm_password"
+                   name="confirm_password"
+                   class="form-control"
+                   placeholder="Re-enter password" required>
+            <span class="input-group-text toggle-password"
+                  onclick="togglePassword('confirm_password')">
+                <i class="fa-solid fa-eye"></i>
+            </span>
+        </div>
+    </div>
+
+</div>
+
 
             <!-- Submit -->
             <button type="submit" class="btn btn-warning w-100 mt-3 hidden" id="submitBtn">Register</button>
@@ -200,13 +228,7 @@ function fetchDetails() {
     // Stop if already fetched with same ID
     if (detailsFetched && document.getElementById("name").value) return;
 
-    // Show loading
-    Swal.fire({
-        title: 'Fetching...',
-        text: 'Please wait while we get your details.',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-    });
+    
 
     fetch(`/get-user-details/?id=${id}&role=${selectedRole}`)
         .then(response => response.json())
@@ -319,5 +341,27 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
     this.submit(); // If all good, submit
 });
 </script>
+<script>
+document.getElementById("username").addEventListener("input", function () {
+    let username = this.value.trim();
+    let errorText = document.getElementById("usernameError");
+
+    if (username.length < 3) {
+        errorText.classList.add("d-none");
+        return;
+    }
+
+    fetch(`/check-username/?username=${encodeURIComponent(username)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                errorText.classList.remove("d-none");
+            } else {
+                errorText.classList.add("d-none");
+            }
+        });
+});
+</script>
+
 </body>
 </html>

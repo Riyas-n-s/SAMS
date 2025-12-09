@@ -229,11 +229,24 @@ from accounts.models import Assignment, AssignmentSubmission  # adjust if your m
 
 def student_unseen_assignments(request):
     student = get_object_or_404(Student, register_number=request.user.profile.register_number)
-    
-    # Assignments not yet submitted by this student
-    submitted_ids = AssignmentSubmission.objects.filter(student=student).values_list('assignment_id', flat=True)
-    unseen_count = Assignment.objects.exclude(id__in=submitted_ids).count()
+
+    # Assignments for student's branch & semester
+    assignments = Assignment.objects.filter(
+        subject__branch=student.branch,
+        subject__semester=student.semester
+    )
+
+    # IDs of assignments already submitted by this student
+    submitted_ids = AssignmentSubmission.objects.filter(
+        student=student,
+        assignment__in=assignments
+    ).values_list('assignment_id', flat=True)
+
+    # Count of assignments not yet submitted
+    unseen_count = assignments.exclude(id__in=submitted_ids).count()
+
     return JsonResponse({"unseen_count": unseen_count})
+
 
 
 from django.shortcuts import render, get_object_or_404

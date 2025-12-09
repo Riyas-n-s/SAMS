@@ -55,7 +55,7 @@ def add_due(request):
         student=student,
         department=department,
         remark=remark,
-        due_date=due_date,
+        due_date=due_date if due_date else None, 
         has_dues=True,
         updated_by=request.user,
         updated_at=timezone.now(),
@@ -79,3 +79,76 @@ def clear_all_dues(request):
     
     messages.success(request, f"All dues cleared for {staff_department} department.")
     return redirect(f'/others/dashboard/?register_number={register_number}')
+
+
+@login_required
+@require_http_methods(["POST"])
+def clear_due(request, due_id):
+    due = get_object_or_404(NoDues, id=due_id)
+
+    # Safety: Only same department staff can clear
+    if due.department != request.user.profile.department:
+        messages.error(request, "You cannot clear dues from another department.")
+        return redirect(f"/others/dashboard/?register_number={due.student.register_number}")
+
+    due.has_dues = False
+    due.save()
+
+    messages.success(request, f"Due cleared for {due.student.register_number}.")
+    return redirect(f"/others/dashboard/?register_number={due.student.register_number}")
+
+
+from django.http import JsonResponse
+from accounts.models import Student, NoDues
+
+def ajax_search_student(request):
+    reg = request.GET.get("register_number")
+
+    if not reg:
+        return JsonResponse({"status": "error"})
+
+    try:
+        student = Student.objects.get(register_number=reg)
+    except Student.DoesNotExist:
+        return JsonResponse({"status": "error"})
+
+    dues = NoDues.objects.filter(student=student).order_by("-updated_at")
+
+    dues_list = []
+    for d in dues:
+        dues_list.append({
+            "id": d.id,
+            "department": d.department,
+            "has_dues": d.has_dues,
+            "date": d.due_date.strftime("%m/%d/%Y") if d.due_date else "",
+            "remark": d.remark if d.remark else "-",
+            "updated_by": d.updated_by.username if d.updated_by else None,
+            "updated_at": d.updated_at.strftime("%d %b %Y, %I:%M %p") if d.updated_at else None,
+        })
+
+    has_any_pending = dues.filter(has_dues=True).exists()
+
+    # ✅ FIXED LAST UPDATED WITH LOCAL TIME
+    latest_due = dues.order_by("-updated_at").first()
+
+    if latest_due and latest_due.updated_at:
+     local_time = timezone.localtime(latest_due.updated_at)
+     last_updated_time = local_time.strftime("%d %b %Y, %I:%M %p")
+    else:
+        last_updated_time = None
+
+    return JsonResponse({
+        "status": "success",
+        "student": {
+            "name": student.name,
+            "register_number": student.register_number,
+            "branch": student.branch,
+            "semester": student.semester,
+        },
+        "dues": dues_list,
+        "has_any_pending": has_any_pending,
+        "last_updated": last_updated_time
+    })
+
+
+

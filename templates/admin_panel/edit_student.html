@@ -3,91 +3,145 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Edit Student</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
-    body { background-color: #f8f9fa; }
-    .card { border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .input-group-text { width: 45px; justify-content: center; }
-    .form-label { font-weight: 500; }
-    .back-btn { margin-top: 20px; }
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 20%, #4f46e5, transparent 60%),
+                radial-gradient(circle at 80% 30%, #22d3ee, transparent 60%),
+                radial-gradient(circle at 50% 80%, #9333ea, transparent 60%),
+                #030712;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-card {
+    width: 100%;
+    max-width: 750px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(16px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 35px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+}
+
+.form-control {
+    background: #020617;
+    border: 1px solid #1f2937;
+    color: white;
+    border-radius: 10px;
+}
+
+.form-control:focus {
+    background: #020617;
+    color: white;
+    border-color: #22d3ee;
+    box-shadow: 0 0 0 1px rgba(34,211,238,0.6);
+}
+
+.form-label {
+    color: #cbd5f5;
+    font-weight: 500;
+}
+
+.input-group-text {
+    background: #020617;
+    border: 1px solid #1f2937;
+    color: #22d3ee;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #22d3ee, #4f46e5);
+    border: none;
+}
+
+.btn-secondary {
+    background: #334155;
+    border: none;
+}
 </style>
+
 </head>
 <body>
-<div class="container mt-5">
-    <div class="card p-4 mx-auto" style="max-width: 700px;">
-        <h3 class="mb-4 text-center">Edit Student</h3>
-        <form method="post">
-            {% csrf_token %}
-            <div class="row g-3">
 
-                <div class="col-md-6">
-                    <label class="form-label" for="id_name">Name</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" name="name" class="form-control" id="id_name" value="{{ form.name.value|default_if_none:'' }}">
-                    </div>
-                    {% if form.name.errors %}
-                        <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
-                    {% endif %}
+<div class="edit-card">
+    <h3 class="text-center mb-4">
+        <i class="fas fa-user-edit text-info"></i> Edit Student
+    </h3>
+
+    <!-- ✅ THIS FORM IS NOW 100% CONNECTED -->
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Name</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" name="name" class="form-control"
+                           value="{{ form.name.value|default_if_none:'' }}">
                 </div>
-
-                <div class="col-md-6">
-                    <label class="form-label" for="id_register_number">Register Number</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
-                        <input type="text" name="register_number" class="form-control" id="id_register_number" value="{{ form.register_number.value|default_if_none:'' }}"readonly>
-                    </div>
-                    {% if form.register_number.errors %}
-                        <div class="text-danger small mt-1">{{ form.register_number.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label" for="id_branch">Branch</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
-                        <input type="text" name="branch" class="form-control" id="id_branch" value="{{ form.branch.value|default_if_none:'' }}">
-                    </div>
-                    {% if form.branch.errors %}
-                        <div class="text-danger small mt-1">{{ form.branch.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label" for="id_semester">Semester</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
-                        <input type="number" name="semester" class="form-control" id="id_semester" value="{{ form.semester.value|default_if_none:'' }}">
-                    </div>
-                    {% if form.semester.errors %}
-                        <div class="text-danger small mt-1">{{ form.semester.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label" for="id_roll_number">Roll Number</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
-                        <input type="number" name="roll_number" class="form-control" id="id_roll_number" value="{{ form.roll_number.value|default_if_none:'' }}">
-                    </div>
-                    {% if form.roll_number.errors %}
-                        <div class="text-danger small mt-1">{{ form.roll_number.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
             </div>
 
-            <div class="d-flex justify-content-between mt-4">
-                <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Save</button>
-                <a href="{% url 'admin_panel:admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            <div class="col-md-6">
+                <label class="form-label">Register Number</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                    <input type="text" name="register_number" class="form-control"
+                           value="{{ form.register_number.value }}" readonly>
+                </div>
             </div>
-        </form>
-    </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Branch</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
+                    <input type="text" name="branch" class="form-control"
+                           value="{{ form.branch.value|default_if_none:'' }}">
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Semester</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                    <input type="number" name="semester" class="form-control"
+                           value="{{ form.semester.value|default_if_none:'' }}">
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Roll Number</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
+                    <input type="number" name="roll_number" class="form-control"
+                           value="{{ form.roll_number.value|default_if_none:'' }}">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success px-4">
+                <i class="fas fa-save me-1"></i> Save Changes
+            </button>
+
+            <a href="{% url 'admin_panel:admin_dashboard' %}?section=manageStudents"
+               class="btn btn-secondary px-4">
+                Cancel
+            </a>
+        </div>
+
+    </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

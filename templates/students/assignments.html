@@ -7,13 +7,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <div class="d-flex justify-content-end mb-3">
-    <label class="form-check-label me-2" for="darkModeToggle">Dark Mode</label>
-    <input type="checkbox" id="darkModeToggle" class="form-check-input">
-</div>
 
 <div class="container mt-5">
-    <!-- Top bar with Back and Logout -->
+
+    <!-- Top bar -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <a href="{% url 'student_dashboard' %}" class="btn btn-outline-primary">
             &larr; Back
@@ -22,66 +19,95 @@
             Logout
         </a>
     </div>
-    <h3 class="mb-4 text-primary"> Assignments</h3>
+
+    <h3 class="mb-4 text-primary">Assignments</h3>
 
     <div class="row">
-        <!-- Available Assignments -->
+
+        <!-- ✅ AVAILABLE ASSIGNMENTS -->
         <div class="col-md-6">
             <div class="card p-3">
                 <h5 class="fw-bold text-primary">Available Assignments</h5>
-                <ul class="list-group">
-                    {% for assignment in assignments %}
-                    <li class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ assignment.title }}</strong><br>
-                                <small class="text-muted">Due: {{ assignment.due_date }}</small>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                {% if assignment.file and assignment.file.url %}
-                                    <a href="{{ assignment.file.url }}" class="btn btn-sm btn-primary me-2" target="_blank">Download</a>
-                                {% endif %}
+<ul class="list-group">
 
-                                {% with submissions_dict|dictkey:assignment.id as submission %}
-                                    {% if submission %}
-                                        {% if submission.status == 'rejected' %}
-                                            <span class="badge bg-danger me-2">Rejected</span>
-                                            <form method="POST" enctype="multipart/form-data" class="d-flex mt-1">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
-                                                <input type="file" name="file" class="form-control form-control-sm me-2" required>
-                                                <button type="submit" class="btn btn-success btn-sm">Upload Again</button>
-                                            </form>
-                                        {% elif submission.status == 'graded' %}
-                                            <span class="badge bg-success">Graded</span>
-                                        {% else %}
-                                            <span class="badge bg-warning">Pending</span>
-                                        {% endif %}
-                                    {% elif assignment.due_date < today %}
-                                        <span class="badge bg-secondary">Closed</span>
-                                    {% else %}
-                                        <form method="POST" enctype="multipart/form-data" class="d-flex">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
-                                            <input type="file" name="file" class="form-control form-control-sm me-2" required>
-                                            <button type="submit" class="btn btn-success btn-sm">Submit</button>
-                                        </form>
-                                    {% endif %}
-                                {% endwith %}
-                            </div>
-                        </div>
-                    </li>
-                    {% empty %}
-                    <li class="list-group-item text-muted">No assignments available.</li>
-                    {% endfor %}
-                </ul>
+    {% for assignment in assignments %}
+    <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center">
+
+            <!-- ✅ LEFT SIDE: SUBJECT + TITLE + DUE DATE -->
+            <div class="d-flex flex-column">
+                <!-- Subject -->
+                <span class="fw-bold text-primary mb-1">
+                    {{ assignment.subject.name }}
+                </span>
+
+                <!-- Title -->
+                <span class="mb-1">
+                    <strong>{{ assignment.title }}</strong>
+                </span>
+
+                <!-- Due Date -->
+                <small class="text-muted">
+                    Due: {{ assignment.due_date|date:"m/d/Y" }}
+                </small>
+            </div>
+
+            <!-- ✅ RIGHT SIDE: (UNCHANGED) -->
+            <div class="d-flex align-items-center">
+                {% if assignment.file %}
+                    <a href="{{ assignment.file.url }}"
+                       class="btn btn-sm btn-primary me-2"
+                       target="_blank">
+                       Download
+                    </a>
+                {% endif %}
+
+                {% with submissions_dict|dictkey:assignment.id as submission %}
+                    {% if submission %}
+                        {% if submission.status == 'rejected' %}
+                            <span class="badge bg-danger me-2">Rejected</span>
+                            <form method="POST" enctype="multipart/form-data" class="d-flex mt-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                                <input type="file" name="file" class="form-control form-control-sm me-2" required>
+                                <button type="submit" class="btn btn-success btn-sm">Upload Again</button>
+                            </form>
+                        {% elif submission.status == 'graded' %}
+                            <span class="badge bg-success">Graded</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% endif %}
+                    {% elif assignment.due_date < today %}
+                        <span class="badge bg-secondary">Closed</span>
+                    {% else %}
+                        <form method="POST" enctype="multipart/form-data" class="d-flex">
+                            {% csrf_token %}
+                            <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                            <input type="file" name="file" class="form-control form-control-sm me-2" required>
+                            <button type="submit" class="btn btn-success btn-sm">Submit</button>
+                        </form>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+        </div>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted text-center">
+        No assignments available.
+    </li>
+    {% endfor %}
+
+</ul>
+
             </div>
         </div>
 
-        <!-- My Submissions -->
+        <!-- ✅ MY SUBMISSIONS -->
         <div class="col-md-6">
             <div class="card p-3">
                 <h5 class="fw-bold text-dark">My Submissions</h5>
+
                 <table class="table table-bordered">
                     <thead class="table-secondary">
                         <tr>
@@ -92,6 +118,7 @@
                             <th>Remarks</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {% for sub in submissions %}
                         <tr>
@@ -115,14 +142,22 @@
                             <td>{{ sub.marks|default:"-" }}</td>
                             <td>{{ sub.remarks|default:"-" }}</td>
                         </tr>
+
                         {% empty %}
-                        <tr><td colspan="5" class="text-center text-muted">No submissions yet.</td></tr>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                No submissions yet.
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
+
                 </table>
             </div>
         </div>
+
     </div>
 </div>
+
 </body>
 </html>

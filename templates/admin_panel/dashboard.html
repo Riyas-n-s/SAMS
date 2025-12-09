@@ -2,191 +2,714 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-    body { background-color: #f8f9fa; }
-    .dashboard-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border-radius: 12px; }
-    .dashboard-card:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-    .section { display: none; margin-top: 20px; }
-    .section.active { display: block; }
-    .card-section { padding: 30px; background: #fff; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .topbar { margin-bottom: 20px; }
-</style>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-main: #050816;
+            --bg-card: #0b1220;
+            --bg-sidebar: #020617;
+            --neon-cyan: #22d3ee;
+            --neon-purple: #a855f7;
+            --text-light: #e5e7eb;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 20%, #4f46e5, transparent 60%),
+                radial-gradient(circle at 80% 30%, #22d3ee, transparent 60%),
+                radial-gradient(circle at 50% 80%, #9333ea, transparent 60%),
+                #030712;
+    animation: bgMove 8s infinite linear;
+    background-size: 200% 200%;
+    color: white;
+    overflow-x: hidden;
+}
+
+@keyframes bgMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    z-index: -1;
+}
+
+body::before {
+    top: -100px;
+    left: -100px;
+    background: #4f46e5;
+    animation: floatOne 12s ease-in-out infinite alternate;
+}
+
+body::after {
+    bottom: -100px;
+    right: -100px;
+    background: #22d3ee;
+    animation: floatTwo 14s ease-in-out infinite alternate;
+}
+
+@keyframes floatOne {
+    from { transform: translate(0,0); }
+    to { transform: translate(120px, 80px); }
+}
+
+@keyframes floatTwo {
+    from { transform: translate(0,0); }
+    to { transform: translate(-120px, -80px); }
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
+        /* ===== LAYOUT ===== */
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ----- Sidebar ----- */
+        .admin-sidebar {
+            width: 250px;
+            background: radial-gradient(circle at top, #0f172a, #020617 60%);
+            border-right: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.45);
+            padding: 24px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-logo-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 20%, #38bdf8, #0f172a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .sidebar-logo span {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .sidebar-item {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: 0.25s;
+        }
+
+        .sidebar-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(148, 163, 184, 0.16);
+            color: #e5e7eb;
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(135deg, #22d3ee33, #a855f733);
+            border: 1px solid rgba(56, 189, 248, 0.7);
+            box-shadow: 0 0 18px rgba(34, 211, 238, 0.5);
+            color: #e5e7eb;
+        }
+
+        .sidebar-section-label {
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            color: #64748b;
+            margin: 18px 0 8px;
+        }
+
+        /* ----- Main Area ----- */
+        .admin-main {
+            flex: 1;
+            padding: 28px 32px;
+        }
+
+        /* ===== TOPBAR ===== */
+
+        .admin-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .admin-title {
+            font-size: 1.9rem;
+            font-weight: 700;
+        }
+
+        .admin-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .logout-btn {
+            border-radius: 999px;
+            padding: 8px 18px;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            background: rgba(15, 23, 42, 0.6);
+            color: #e5e7eb;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.25s;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(248, 113, 113, 0.7);
+        }
+
+        /* ===== MAIN CARDS ROW (Students / Staffs) ===== */
+
+        .cards-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            position: relative;
+            border-radius: 24px;
+            padding: 42px 32px;
+            cursor: pointer;
+            overflow: hidden;
+            background: radial-gradient(circle at top left, #1e293b 0, #020617 65%);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            box-shadow:
+                0 25px 60px rgba(15, 23, 42, 0.85),
+                inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+            transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+        }
+
+        .action-card::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at top, #22d3ee44, transparent 55%);
+            opacity: 0;
+            transition: 0.4s ease;
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 70px rgba(15, 23, 42, 0.95);
+            border-color: rgba(56, 189, 248, 0.8);
+        }
+
+        .action-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            background: radial-gradient(circle at 30% 20%, #38bdf8, #1d2438);
+            color: white;
+            font-size: 32px;
+            box-shadow: 0 12px 30px rgba(56, 189, 248, 0.5);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        .action-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .action-subtitle {
+            font-size: 0.95rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* ===== INNER SECTIONS (Manage/Add/Staff) ===== */
+
+        .section {
+            display: none;
+            margin-bottom: 30px;
+            animation: fadeUp 0.4s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .glass-card {
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+            padding: 24px;
+        }
+
+        .glass-card h4 {
+            margin-bottom: 18px;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #020617;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            color: #e5e7eb;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.6);
+            background-color: #020617;
+            color: #e5e7eb;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .btn-primary,
+        .btn-success {
+            border-radius: 999px;
+            padding-inline: 18px;
+        }
+
+        /* ===== Animations ===== */
+
+        @keyframes floatIcon {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .admin-layout {
+                flex-direction: column;
+            }
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 18px;
+            }
+            .sidebar-menu {
+                display: flex;
+                gap: 6px;
+            }
+            .sidebar-link span {
+                display: none;
+            }
+            .sidebar-section-label {
+                display: none;
+            }
+            .admin-main {
+                padding: 18px 16px 26px;
+            }
+        }
+
+
+        .dashboard-card {
+    position: relative;
+    cursor: pointer;
+    border-radius: 20px;
+    padding: 50px 20px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: white;
+    transition: 0.4s ease;
+    overflow: hidden;
+}
+
+/* GLOW BORDER */
+.dashboard-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(90deg, #22d3ee, #4f46e5, #9333ea, #22d3ee);
+    background-size: 400%;
+    animation: borderGlow 6s linear infinite;
+    z-index: -1;
+    filter: blur(6px);
+    opacity: 0;
+    transition: 0.4s;
+}
+
+.dashboard-card:hover::before {
+    opacity: 1;
+}
+
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 400% 50%; }
+}
+
+/* HOVER LIFT */
+.dashboard-card:hover {
+    transform: translateY(-14px) scale(1.04);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.75);
+}
+.dashboard-card i {
+    font-size: 52px;
+    margin-bottom: 15px;
+    color: #22d3ee;
+    text-shadow: 0 0 12px rgba(34,211,238,0.8);
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0); }
+}
+
+
+
+
+    </style>
 </head>
 <body>
+    <canvas id="bgCanvas"></canvas>
 
-<div class="container mt-5">
 
-    <!-- Topbar with Back & Logout -->
-    <div class="topbar d-flex justify-content-between align-items-center mb-4">
-        <h2>Admin Dashboard</h2>
-        <div class="d-flex gap-2">
-            <button id="backBtn" class="btn btn-secondary btn-sm" onclick="backToMain()" style="display:none;">
-                <i class="fas fa-arrow-left me-1"></i> Back
-            </button>
-            <a href="{% url 'logout' %}" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-sign-out-alt me-1"></i> Logout
+<div class="admin-layout">
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-circle">A</div>
+            <span>Admin Panel</span>
+        </div>
+
+        <div class="sidebar-section-label">Main</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="javascript:void(0)" class="sidebar-link active" onclick="backToMain()">
+                    <i class="fa-solid fa-grid-2"></i><span>Overview</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-section-label">Management</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="javascript:void(0)" class="sidebar-link" onclick="showSection('studentSection')">
+                    <i class="fa-solid fa-user-graduate"></i><span>Students</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="javascript:void(0)" class="sidebar-link" onclick="showSection('staffSection')">
+                    <i class="fa-solid fa-user-tie"></i><span>Staffs & Others</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="admin-main">
+
+        <!-- Topbar -->
+         <div class="admin-subtitle">
+    Welcome, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+</div>
+
+        <div class="admin-topbar">
+            <div>
+                <div class="admin-title">Admin Dashboard</div>
+                <div class="admin-subtitle">Manage students, staff & academic data from one place.</div>
+            </div>
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
             </a>
         </div>
-    </div>
 
-    <!-- Main Cards -->
-    <div id="mainCards" class="row text-center">
-        <div class="col-md-6 mb-4">
-            <div class="card dashboard-card p-5" onclick="showSection('studentSection')">
-                <i class="fas fa-user-graduate fa-3x mb-3"></i>
-                <h4>Students</h4>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card dashboard-card p-5" onclick="showSection('staffSection')">
-                <i class="fas fa-user-tie fa-3x mb-3"></i>
-                <h4>Staffs</h4>
-            </div>
-        </div>
-    </div>
-
-    <!-- STUDENT SECTION -->
-    <div id="studentSection" class="section">
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-                <div class="card dashboard-card card-section text-center" onclick="showSection('manageStudents')">
-                    <i class="fas fa-users fa-2x mb-2"></i>
-                    <h5>Manage Students</h5>
+        <!-- MAIN CARDS (OVERVIEW) -->
+        <div id="mainCards" class="cards-row">
+            <!-- Students Card -->
+            <div class="action-card" onclick="showSection('studentSection')">
+                <div class="action-icon-wrapper">
+                    <i class="fa-solid fa-user-graduate"></i>
                 </div>
+                <div class="action-title">Students</div>
+                <div class="action-subtitle">Manage & add student records, bulk import, and more.</div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="card dashboard-card card-section text-center" onclick="showSection('addStudents')">
-                    <i class="fas fa-user-plus fa-2x mb-2"></i>
-                    <h5>Add Students</h5>
+
+            <!-- Staffs Card -->
+            <div class="action-card" onclick="showSection('staffSection')">
+                <div class="action-icon-wrapper">
+                    <i class="fa-solid fa-user-tie"></i>
                 </div>
+                <div class="action-title">Staffs</div>
+                <div class="action-subtitle">Manage staff & other department logins.</div>
             </div>
+        </div>
+            <!-- ✅ Animated Stats Row -->
+<div class="row mb-4 text-center" id="statsRow">
+
+
+<div class="col-md-3 mb-3" id="studentStat">
+
+        <div class="dashboard-card">
+            <i class="fas fa-user-graduate"></i>
+            <h3 class="counter" data-target="{{ total_students }}">0</h3>
+
+            <p>Total Students</p>
         </div>
     </div>
 
-    <!-- MANAGE STUDENTS -->
-    {% include 'admin_panel/manage_students.html' %}
+    <div class="col-md-3 mb-3" id="othersStat">
 
-    <!-- ADD STUDENTS -->
-    <div id="addStudents" class="section">
-        <div class="card card-section p-4">
-            <h4 class="mb-4">Add Students</h4>
-            <div class="row g-4">
-                <!-- Individual Student Form -->
-                <div class="col-md-6">
-                    <div class="card p-4 h-100">
-                        <h5 class="mb-3">Add Individual Student</h5>
-                        <form method="post" action="{% url 'admin_panel:add_student' %}">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="form-label" for="{{ form.name.id_for_label }}">Name</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                    <input type="text" name="name" class="form-control" id="{{ form.name.id_for_label }}" value="{{ form.name.value|default_if_none:'' }}">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="{{ form.register_number.id_for_label }}">Register Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
-                                    <input type="text" name="register_number" class="form-control" id="{{ form.register_number.id_for_label }}" value="{{ form.register_number.value|default_if_none:'' }}">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="{{ form.branch.id_for_label }}">Branch</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
-                                    <input type="text" name="branch" class="form-control" id="{{ form.branch.id_for_label }}" value="{{ form.branch.value|default_if_none:'' }}">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="{{ form.semester.id_for_label }}">Semester</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
-                                    <input type="number" name="semester" class="form-control" id="{{ form.semester.id_for_label }}" value="{{ form.semester.value|default_if_none:'' }}">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="{{ form.roll_number.id_for_label }}">Roll Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
-                                    <input type="number" name="roll_number" class="form-control" id="{{ form.roll_number.id_for_label }}" value="{{ form.roll_number.value|default_if_none:'' }}">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-success"><i class="fas fa-plus me-1"></i> Add Student</button>
-                        </form>
-                    </div>
-                </div>
+        <div class="dashboard-card">
+            <i class="fas fa-user-tie"></i>
+            <h3 class="counter" data-target="{{ total_others_staff }}">0</h3>
+<p>Others Staff</p>
 
-                <!-- Bulk Upload Students -->
-                <div class="col-md-6">
-                    <div class="card p-4 h-100">
-                        <h5 class="mb-3">Bulk Upload Students (CSV)</h5>
-                        <form method="post" enctype="multipart/form-data" action="{% url 'admin_panel:bulk_upload_students' %}">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="form-label" for="{{ form.file.id_for_label }}">Choose CSV File</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-file-csv"></i></span>
-                                    <input type="file" name="file" class="form-control" id="{{ form.file.id_for_label }}">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-upload me-1"></i> Upload</button>
-                        </form>
-                        <hr>
-                        <p><b>CSV Format:</b></p>
-                        <pre>register_number,name,branch,semester,roll_number</pre>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
-<!-- STAFF SECTION -->
-<div id="staffSection" class="section">
-    <div class="container">
-        <div class="row justify-content-center">
 
-            <div class="col-md-8 col-lg-6 mb-3">
-                <a href="{% url 'admin_panel:manage_all_staff' %}" style="text-decoration: none; color: inherit;">
-                    <div class="card dashboard-card card-section text-center shadow-sm p-4 h-100">
-                        <i class="fas fa-users fa-2x mb-2 text-primary"></i>
-                        <h5>Manage Staff & Others</h5>
-                    </div>
-                </a>
-            </div>
+    <div class="col-md-3 mb-3" id="teacherStat">
 
-            <div class="col-md-6 col-lg-5 mb-3">
-                <a href="{% url 'admin_panel:a' %}" style="text-decoration: none; color: inherit;">
-                    <div class="card dashboard-card card-section text-center shadow-sm p-4 h-100">
-                        <i class="fas fa-user-friends fa-2x mb-2 text-success"></i>
-                        <h5>Add Staff</h5>
-                    </div>
-                </a>
-            </div>
-
+        <div class="dashboard-card">
+            <i class="fas fa-chalkboard-teacher"></i>
+           <h3 class="counter" data-target="{{ total_staff }}">0</h3>
+            <p>Teachers</p>
         </div>
     </div>
-</div>
 
     
+
 </div>
 
-<!-- DELETE MODAL -->
+        <!-- ========== STUDENT SECTION ========== -->
+        <section id="studentSection" class="section">
+
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3">
+                    <div class="glass-card text-center" onclick="showSection('manageStudents')">
+                        <i class="fa-solid fa-users fa-2x mb-2"></i>
+                        <h5 class="mb-1">Manage Students</h5>
+                        <small class="text-muted">Edit, delete and view all student records.</small>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="glass-card text-center" onclick="showSection('addStudents')">
+                        <i class="fa-solid fa-user-plus fa-2x mb-2"></i>
+                        <h5 class="mb-1">Add Students</h5>
+                        <small class="text-muted">Add single or multiple students via CSV.</small>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- MANAGE STUDENTS (existing include) -->
+        {% include 'admin_panel/manage_students.html' %}
+
+        <!-- ========== ADD STUDENTS SECTION ========== -->
+        <section id="addStudents" class="section">
+            <div class="glass-card">
+                <h4 class="mb-3">Add Students</h4>
+                <div class="row g-4">
+                    <!-- Individual Form -->
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Add Individual Student</h5>
+                            <form method="post" action="{% url 'admin_panel:add_student' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                                    <input type="text" name="name" class="form-control"
+                                           id="{{ form.name.id_for_label }}"
+                                           value="{{ form.name.value|default_if_none:'' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.register_number.id_for_label }}" class="form-label">
+                                        Register Number
+                                    </label>
+                                    <input type="text" name="register_number" class="form-control"
+                                           id="{{ form.register_number.id_for_label }}"
+                                           value="{{ form.register_number.value|default_if_none:'' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.branch.id_for_label }}" class="form-label">Branch</label>
+                                    <input type="text" name="branch" class="form-control"
+                                           id="{{ form.branch.id_for_label }}"
+                                           value="{{ form.branch.value|default_if_none:'' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.semester.id_for_label }}" class="form-label">Semester</label>
+                                    <input type="number" name="semester" class="form-control"
+                                           id="{{ form.semester.id_for_label }}"
+                                           value="{{ form.semester.value|default_if_none:'' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.roll_number.id_for_label }}" class="form-label">
+                                        Roll Number
+                                    </label>
+                                    <input type="number" name="roll_number" class="form-control"
+                                           id="{{ form.roll_number.id_for_label }}"
+                                           value="{{ form.roll_number.value|default_if_none:'' }}">
+                                </div>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa-solid fa-plus me-1"></i> Add Student
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Upload -->
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Bulk Upload Students (CSV)</h5>
+                            <form method="post" enctype="multipart/form-data"
+                                  action="{% url 'admin_panel:bulk_upload_students' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="{{ form.file.id_for_label }}" class="form-label">Choose CSV File</label>
+                                    <input type="file" name="file" class="form-control"
+                                           id="{{ form.file.id_for_label }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-upload me-1"></i> Upload
+                                </button>
+                            </form>
+                            <hr class="text-secondary">
+                            <p class="mb-1"><strong>CSV Format:</strong></p>
+                            <pre class="text-secondary small mb-0">
+register_number,name,branch,semester,roll_number
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== STAFF SECTION ========== -->
+        <section id="staffSection" class="section">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <a href="{% url 'admin_panel:manage_all_staff' %}" style="text-decoration: none;">
+                        <div class="glass-card text-center">
+                            <i class="fa-solid fa-users-gear fa-2x mb-2"></i>
+                            <h5 class="mb-1">Manage Staff & Others</h5>
+                            <small class="text-muted">View, edit and remove staff & others accounts.</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <a href="{% url 'admin_panel:a' %}" style="text-decoration: none;">
+                        <div class="glass-card text-center">
+                            <i class="fa-solid fa-user-plus fa-2x mb-2 text-success"></i>
+                            <h5 class="mb-1">Add Staff</h5>
+                            <small class="text-muted">Create new staff or department login.</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- DELETE MODAL (unchanged) -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header border-secondary">
         <h5 class="modal-title">Confirm Delete</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         Are you sure you want to delete <strong id="deleteItemName"></strong>?
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer border-secondary">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
       </div>
@@ -194,51 +717,238 @@
   </div>
 </div>
 
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function showSection(sectionId) {
-    document.getElementById('mainCards').style.display = 'none';
-    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.getElementById('backBtn').style.display = 'inline-block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function backToMain() {
-    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-    document.getElementById('mainCards').style.display = 'flex';
-    document.getElementById('backBtn').style.display = 'none';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function backToStudentOptions() {
-    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-    document.getElementById('studentSection').classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function searchStudent() {
-    let input = document.getElementById('studentSearch').value.toLowerCase();
-    let table = document.getElementById('studentTable');
-    let trs = table.getElementsByTagName('tr');
-    for (let i = 1; i < trs.length; i++) {
-        let reg = trs[i].getElementsByTagName('td')[1];
-        trs[i].style.display = reg && (reg.textContent.toLowerCase().includes(input)) ? '' : 'none';
+    function clearSidebarActive() {
+        document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
     }
+
+   
+
+
+function showSection(sectionId) {
+    // Hide overview cards
+    document.getElementById('mainCards').style.display = 'none';
+
+    // ✅ ALWAYS HIDE COUNTS WHEN OPENING STUDENT OR STAFF
+    const statsRow = document.getElementById('statsRow');
+    if (statsRow) statsRow.style.display = 'none';
+
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+
+    // Show selected section
+    const sec = document.getElementById(sectionId);
+    if (sec) sec.classList.add('active');
+
+    // Sidebar active state
+    clearSidebarActive();
+    if (sectionId === 'studentSection' || sectionId === 'manageStudents' || sectionId === 'addStudents') {
+        document.querySelectorAll('.sidebar-link')[1]?.classList.add('active');
+    } else if (sectionId === 'staffSection') {
+        document.querySelectorAll('.sidebar-link')[2]?.classList.add('active');
+    }
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
-// Immediate delete without any popup
-document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const url = this.dataset.url;
-        window.location.href = url;
-    });
-});
+function backToMain() {
+    // Hide all inner sections
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
 
-window.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const section = urlParams.get('section'); // e.g., 'manageStudents'
-    if(section) { showSection(section); }
+    // ✅ Show overview cards again
+    document.getElementById('mainCards').style.display = 'grid';
+
+    // ✅ SHOW COUNTS AGAIN ON HOME ONLY
+    const statsRow = document.getElementById('statsRow');
+    if (statsRow) statsRow.style.display = 'flex';
+
+    clearSidebarActive();
+    document.querySelector('.sidebar-link')?.classList.add('active');
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+
+
+    // Keep your existing searching / delete JS from previous template if needed
+</script>
+<script>
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+for (let i = 0; i < 60; i++) {
+    particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 1,
+        dx: Math.random() - 0.5,
+        dy: Math.random() - 0.5
+    });
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(0, 200, 255, 0.7)";
+
+    particles.forEach(p => {
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+<style>
+#bgCanvas{
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+}
+
+.counter {
+    font-size: 36px;
+    font-weight: 800;
+    color: #22d3ee;
+    text-shadow: 0 0 12px rgba(34,211,238,0.9);
+}
+/* ===================== */
+/* ✅ FINAL STATS COLOR FIX */
+/* ===================== */
+
+/* Force pure white on stat cards only */
+.dashboard-card,
+.dashboard-card * {
+    color: #ffffff !important;
+}
+
+/* Clean strong number */
+.dashboard-card .counter {
+    font-size: 38px;
+    font-weight: 900;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* Clean icon */
+.dashboard-card i {
+    font-size: 52px;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* Label text */
+.dashboard-card p {
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+/* Slightly darken card glass for contrast */
+.dashboard-card {
+    background: rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
+    backdrop-filter: blur(14px);
+}
+/* =============================== */
+/* ✅ CENTER THE 3 STATS BOXES */
+/* =============================== */
+
+/* Force the stats row to behave like a centered flex layout */
+#statsRow {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+
+/* Force each stat card to have equal width */
+.row.text-center > .col-md-3 {
+    flex: 0 0 300px !important;
+    max-width: 300px !important;
+}
+.glass-card small {
+    color: #ffffff !important;
+}
+
+</style>
+<script>
+const counters = document.querySelectorAll('.counter');
+
+counters.forEach(counter => {
+    counter.innerText = '0';
+
+    let target = Number(counter.getAttribute('data-target'));
+
+    // ✅ SAFETY FIX: If target is invalid → force 0
+    if (isNaN(target)) {
+        target = 0;
+    }
+
+    const updateCounter = () => {
+        const current = Number(counter.innerText);
+        const increment = Math.max(1, Math.floor(target / 80));
+
+        if (current < target) {
+            counter.innerText = current + increment;
+            setTimeout(updateCounter, 20);
+        } else {
+            counter.innerText = target;
+        }
+    };
+
+    updateCounter();
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function showSection(sectionId) {
+    document.getElementById('mainCards').style.display = 'none';
+
+    // ✅ HIDE STATS ALWAYS
+    const statsRow = document.getElementById('statsRow');
+    if (statsRow) statsRow.style.display = 'none';
+
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+
+    const sec = document.getElementById(sectionId);
+    if (sec) sec.classList.add('active');
+
+    clearSidebarActive();
+
+    if (sectionId === 'studentSection' || sectionId === 'manageStudents' || sectionId === 'addStudents') {
+        document.querySelectorAll('.sidebar-link')[1]?.classList.add('active');
+    } else if (sectionId === 'staffSection') {
+        document.querySelectorAll('.sidebar-link')[2]?.classList.add('active');
+    }
+}
+
+function backToMain() {
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+
+    document.getElementById('mainCards').style.display = 'grid';
+
+    // ✅ SHOW STATS ONLY ON HOME
+    const statsRow = document.getElementById('statsRow');
+    if (statsRow) statsRow.style.display = 'flex';
+
+    clearSidebarActive();
+    document.querySelector('.sidebar-link')?.classList.add('active');
+}
+</script>
+
 </body>
 </html>

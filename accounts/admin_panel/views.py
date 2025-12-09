@@ -8,11 +8,36 @@ from django.urls import reverse
 def is_admin_user(user):
     return user.is_superuser or user.is_staff
 
+from accounts.models import Student, Staff, OthersStaff
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+def is_admin_user(user):
+    return user.is_superuser or user.is_staff
+
+
 @login_required
 @user_passes_test(is_admin_user)
 def admin_dashboard(request):
+
+    # ✅ REQUIRED FOR STUDENT TABLE
     students = Student.objects.all().order_by('register_number')
-    return render(request, 'admin_panel/dashboard.html', {'students': students})
+
+    # ✅ FIXED COUNTS
+    total_students = Student.objects.count()
+    total_staff = Staff.objects.count()              # ✅ TEACHERS
+    total_others_staff = OthersStaff.objects.count() # ✅ OTHERS
+
+    context = {
+        "students": students,
+        "total_students": total_students,
+        "total_staff": total_staff,
+        "total_others_staff": total_others_staff,
+    }
+
+    return render(request, "admin_panel/dashboard.html", context)
+
+
+    
 
 @login_required
 @user_passes_test(is_admin_user)
@@ -65,76 +90,101 @@ def add_student(request):
     )
 # --- Bulk upload students ---
 
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 import pandas as pd
 from accounts.models import Student
 from .forms import StudentBulkUploadForm
+
 def bulk_upload_students(request):
     form = StudentBulkUploadForm(request.POST or None, request.FILES or None)
-    errors_found = False
-    added, skipped, invalid_rows = 0, 0, []  # track invalid rows
+    added, skipped, invalid_rows = 0, 0, []  # track added, skipped, invalid
     duplicate_students = []
 
     if request.method == "POST" and form.is_valid():
         file = request.FILES.get("file")
         if not file or not file.name.endswith(".csv"):
             messages.error(request, "Please upload a CSV file only.")
-            errors_found = True
         else:
             try:
-                import pandas as pd
                 df = pd.read_csv(file)
-                required_headers = {"register_number", "name", "branch", "semester", "roll_number"}
 
-                # Validate headers
-                if set(df.columns) != required_headers:
+                # Required headers in exact order
+                required_headers = ["register_number", "name", "branch", "semester", "roll_number"]
+                
+                # Strict header order check
+                if list(df.columns) != required_headers:
                     messages.error(
                         request,
-                        f"Invalid CSV format! Headers must be: {', '.join(required_headers)}"
+                        f"Invalid CSV format! Headers must be exactly: {', '.join(required_headers)}"
                     )
-                    errors_found = True
                 else:
+                    allowed_branches = ["CT", "ELS", "CSE", "ECE"]  # adjust as needed
+
                     for idx, row in df.iterrows():
-                        # Check row length to prevent improper formatting
-                        if len(row) != len(required_headers):
-                            invalid_rows.append(idx + 2)  # +2 because CSV has header
+                        line_no = idx + 2  # CSV line number
+                        reg_no = str(row["register_number"]).strip()
+                        name = str(row["name"]).strip()
+                        branch = str(row["branch"]).strip()
+                        semester = row["semester"]
+                        roll_number = row["roll_number"]
+
+                        # Row validation
+                        invalid = False
+                        if not reg_no.isdigit() or len(reg_no) != 8:
+                            invalid = True
+                        elif not all(x.isalpha() or x.isspace() for x in name):
+                            invalid = True
+                        elif branch not in allowed_branches:
+                            invalid = True
+                        try:
+                            semester = int(semester)
+                            roll_number = int(roll_number)
+                        except:
+                            invalid = True
+
+                        if invalid:
+                            invalid_rows.append(line_no)
                             continue
 
-                        reg_no = str(row["register_number"]).strip()
+                        # Check duplicates
                         if Student.objects.filter(register_number=reg_no).exists():
                             skipped += 1
                             duplicate_students.append({
                                 "register_number": reg_no,
-                                "name": row["name"],
-                                "branch": row["branch"],
-                                "semester": row["semester"],
-                                "roll_number": row["roll_number"],
+                                "name": name,
+                                "branch": branch,
+                                "semester": semester,
+                                "roll_number": roll_number,
                             })
                         else:
                             Student.objects.create(
                                 register_number=reg_no,
-                                name=row["name"],
-                                branch=row["branch"],
-                                semester=row["semester"],
-                                roll_number=row["roll_number"]
+                                name=name,
+                                branch=branch,
+                                semester=semester,
+                                roll_number=roll_number
                             )
                             added += 1
 
+                    # Show messages
+                    if added:
+                        messages.success(request, f"{added} student(s) added successfully!")
                     if skipped:
                         messages.warning(request, f"{skipped} student(s) skipped (already exist).")
                     if invalid_rows:
-                        messages.error(request, f"Improperly formatted row(s): {', '.join(map(str, invalid_rows))}")
+                        messages.error(
+                            request,
+                            f"Improperly formatted row(s): {', '.join(map(str, invalid_rows))}"
+                        )
 
             except Exception as e:
                 messages.error(request, f"Error processing file: {e}")
-                errors_found = True
 
-        if added > 0 and not errors_found:
-            messages.success(request, f"{added} student(s) added successfully!")
+        # Redirect only if students added successfully
+        if added > 0 and not invalid_rows:
             return redirect(reverse('admin_panel:admin_dashboard') + '?section=manageStudents')
-        elif added == 0 and (skipped > 0 or invalid_rows):
-            errors_found = True  # stay on page
 
     return render(
         request,
@@ -145,6 +195,8 @@ def bulk_upload_students(request):
             "invalid_rows": invalid_rows
         }
     )
+
+    
 
 # --- Add individual student ---
 
@@ -246,20 +298,7 @@ def manage_all_staff(request):
     })
 
 
-# Edit Staff
-#def edit_staff(request, staff_id):
-    staff = get_object_or_404(Staff, id=staff_id)
-    
-    if request.method == "POST":
-        staff.name = request.POST.get('name')
-        staff.department = request.POST.get('department')
-        staff.staff_id = request.POST.get('staff_id')
-        staff.save()
-        messages.success(request, 'Staff updated successfully!')
-        return redirect('admin_panel:manage_all_staff')
-    
-    return render(request, 'admin_panel/edit_staff.html', {'staff': staff})
-
+#
 
 
 
@@ -292,62 +331,6 @@ def edit_staff(request, staff_id):
 
 
 
-
-# Delete Staff
-#def delete_staff(request, staff_id):
-    staff = get_object_or_404(Staff, id=staff_id)
-
-    if request.method == "POST":
-        try:
-            # Delete linked Profile and User safely
-            profile = Profile.objects.filter(staff_id=staff.staff_id).first()
-            if profile:
-                if profile.user:
-                    profile.user.delete()  # Delete linked User
-                    print(f"✅ User deleted for Staff {staff.staff_id}")
-                profile.delete()  # Delete Profile
-                print(f"✅ Profile deleted for Staff {staff.staff_id}")
-
-            # Delete the Staff record
-            staff.delete()
-            messages.success(request, f"✅ Staff {staff.staff_id} and related data deleted successfully!")
-
-        except Exception as e:
-            messages.error(request, f"❌ Error deleting Staff: {e}")
-
-        return redirect("admin_panel:manage_all_staff")
-
-    # GET request: show confirmation page
-    return render(request, "admin_panel/confirm_delete_staff.html", {"staff": staff})
-#def delete_staff(request, staff_id):
-    staff = get_object_or_404(Staff, id=staff_id)
-
-    if request.method == "POST":
-        try:
-            # 1️⃣ Delete linked User (only if exists)
-            if staff.user:
-                staff.user.delete()
-                print(f"✅ User deleted for Staff {staff.staff_id}")
-
-            # 2️⃣ Delete Profile safely (only if exists)
-            profile = Profile.objects.filter(staff_id=staff.staff_id).first()
-            if profile:
-                profile.delete()
-                print(f"✅ Profile deleted for Staff {staff.staff_id}")
-            else:
-                print(f"⚠️ No Profile found for Staff {staff.staff_id}")
-
-            # 3️⃣ Finally delete Staff
-            staff.delete()
-            messages.success(request, f"✅ Staff {staff.staff_id} deleted successfully!")
-
-        except Exception as e:
-            messages.error(request, f"❌ Error deleting Staff: {e}")
-
-        return redirect("admin_panel:manage_all_staff")
-
-    # GET → Show confirmation template
-    return render(request, "admin_panel/confirm_delete_staff.html", {"staff": staff})
 def delete_staff(request, staff_id):
     staff = get_object_or_404(Staff, id=staff_id)
 
@@ -376,20 +359,6 @@ def delete_staff(request, staff_id):
     # GET request: show confirmation page
     return render(request, "admin_panel/confirm_delete_staff.html", {"staff": staff})
 
-# Edit OthersStaff
-#def edit_others_staff(request, others_id):
-    other = get_object_or_404(OthersStaff, id=others_id)
-    
-    if request.method == "POST":
-        other.name = request.POST.get('name')
-        other.staff_id = request.POST.get('staff_id')
-        other.staff_in_charge = request.POST.get('staff_in_charge')
-        other.save()
-        messages.success(request, 'Others Staff updated successfully!')
-        return redirect('admin_panel:manage_all_staff')
-    
-    return render(request, 'admin_panel/edit_others_staff.html', {'other': other})
-
 
 def edit_others_staff(request, others_id):
     other = get_object_or_404(OthersStaff, id=others_id)
@@ -416,12 +385,7 @@ def edit_others_staff(request, others_id):
     
     return render(request, "admin_panel/edit_others_staff.html", {"other": other})
 
-# Delete OthersStaff
-#def delete_others_staff(request, others_id):
-    other = get_object_or_404(OthersStaff, id=others_id)
-    other.delete()
-    messages.success(request, 'Others Staff deleted successfully!')
-    return redirect('admin_panel:manage_all_staff')
+
 from accounts.models import OthersStaff, Profile
 
 def delete_others_staff(request, others_id):
@@ -663,3 +627,6 @@ def a(request):
     Your intermediate staff page.
     """
     return render(request, 'admin_panel/a.html')
+
+
+

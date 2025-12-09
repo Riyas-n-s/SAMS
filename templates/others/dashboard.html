@@ -1,128 +1,656 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Others Dashboard - No Dues</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
     <style>
         body {
-            background-color: #f4f6fa;
+            background: #f4f7fb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
-        .topbar {
-            background-color: #fff;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+
+        .page-wrapper {
+            min-height: 100vh;
         }
-        .dashboard-card {
-            background-color: #fff;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
+
+        .top-card {
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            background: #ffffff;
         }
-        .dashboard-card h4 {
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 8px;
-            margin-bottom: 20px;
+
+        .search-card,
+        .student-card,
+        .dues-card,
+        .history-card {
+            border-radius: 18px;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+            background: #ffffff;
         }
-        .btn-custom {
-            min-width: 140px;
+
+        .brand-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #e0eeff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d6efd;
+            font-size: 24px;
         }
-        .list-group-item {
-            border: none;
-            padding-left: 0;
-            padding-right: 0;
+
+        .logout-btn {
+            border-radius: 999px;
+            padding-inline: 20px;
+            font-weight: 500;
+        }
+
+        .badge-status {
+            font-size: 0.78rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 999px;
+            padding: 0.65rem 1rem;
+        }
+
+        .rounded-16 {
+            border-radius: 16px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .input-with-icon {
+            padding-left: 40px;
+        }
+
+        .switch-label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .table thead {
+            background-color: #f3f4f6;
+        }
+
+        .table th {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .avatar-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d6efd, #38bdf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 575.98px) {
+            .top-card {
+                border-radius: 0 0 18px 18px;
+            }
+        }
+
+        /* ✅ Toggle color styling */
+        .form-check-input {
+            cursor: pointer;
+        }
+        .form-check-input:checked {
+            background-color: #dc3545;
+            border-color: #dc3545;
         }
     </style>
 </head>
-<body class="container mt-4">
+<body>
+<div class="page-wrapper d-flex flex-column">
+    <div class="container py-4 py-md-5">
 
-<!-- Top bar -->
-<div class="d-flex justify-content-between align-items-center topbar">
-    <h3 class="mb-0"><i class="fa fa-user-circle me-2"></i>Welcome, <span class="text-primary">{{ staff_department }}</span></h3>
-    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
-        <i class="fa fa-sign-out-alt"></i> Logout
-    </a>
-</div>
-
-<!-- Search student form -->
-<div class="dashboard-card mb-4">
-    <form method="get" action="{% url 'others_dashboard' %}" class="d-flex flex-wrap gap-2">
-        <input type="text" name="register_number" placeholder="Enter Register Number" required
-               class="form-control" style="max-width:350px;"
-               value="{{ request.GET.register_number|default:'' }}">
-        <button type="submit" class="btn btn-primary btn-custom"><i class="fa fa-search me-1"></i> Search</button>
-    </form>
-
-    <!-- Display messages (e.g., Student not found) -->
-   {% if messages %}
-<div class="mt-3">
-    {% for message in messages %}
-        {% if message.message == "Student not found!" %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <i class="fa fa-exclamation-triangle me-2"></i>{{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <!-- Top Welcome / Header -->
+        <div class="top-card px-4 py-3 py-md-4 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="brand-circle">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h5 class="mb-0 fw-semibold">Welcome, {{ request.user.profile.name|default:"Staff" }}</h5>
+                        <span class="badge rounded-pill text-bg-primary px-3">
+                            {{ request.user.profile.department|default:"Department" }} Panel
+                        </span>
+                    </div>
+                    <small class="text-muted">
+                        Use this page to update <strong>No Dues</strong> status for students.
+                    </small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div class="text-end me-2 d-none d-md-block">
+                    <div class="small text-muted">Logged in as</div>
+                    <div class="fw-semibold">{{ request.user.username }}</div>
+                </div>
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger logout-btn">
+                    <i class="fa-solid fa-right-from-brain fa-rotate-180 me-2"></i>Logout
+                </a>
+            </div>
         </div>
-        {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
 
-
-    {% if student %}
-    <!-- Unified Card Content -->
-    <div class="mt-4">
-
-        <h4><i class="fa fa-user me-2"></i>Student Details</h4>
-        <p><strong>Name:</strong> {{ student.name }}</p>
-        <p><strong>Register Number:</strong> {{ student.register_number }}</p>
-        <p><strong>Branch:</strong> {{ student.branch }}</p>
-
-        <h4 class="mt-4"><i class="fa fa-exclamation-triangle me-2"></i>Previous Dues</h4>
-        {% if dues %}
-        <ul class="list-group mb-3">
-            {% for due in dues %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span><strong>{{ due.department }}</strong> — {{ due.remark }}</span>
-                <span class="badge bg-danger">{{ due.due_date }}</span>
-            </li>
-            {% endfor %}
-        </ul>
-        <form method="post" action="{% url 'clear_all_dues' %}">
-            {% csrf_token %}
-            <input type="hidden" name="register_number" value="{{ student.register_number }}">
-            <button type="submit" class="btn btn-danger btn-custom"><i class="fa fa-check-circle me-1"></i> Clear All Dues</button>
-        </form>
-        {% else %}
-        <p class="text-success">No previous dues for this student.</p>
-        {% endif %}
-
-        <h4 class="mt-4"><i class="fa fa-plus-circle me-2"></i>Add New Due</h4>
-        <form method="post" action="{% url 'add_due' %}" style="max-width:400px;">
-            {% csrf_token %}
-            <input type="hidden" name="register_number" value="{{ student.register_number }}">
-            
-            <div class="mb-3">
-                <label class="form-label">Department (Auto-filled)</label>
-                <input type="text" name="department" class="form-control" value="{{ staff_department }}" readonly>
+        <!-- Alerts -->
+        <div id="alert-container" class="mb-3" style="display: none;">
+            <div class="alert alert-dismissible fade show rounded-16 py-2 px-3" role="alert">
+                <span id="alert-message"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <div class="mb-3">
-                <label for="remark" class="form-label">Remark</label>
-                <input type="text" id="remark" name="remark" class="form-control" required>
+        </div>
+
+        <!-- Search Card -->
+        <div class="search-card px-4 py-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h5 class="mb-1 fw-semibold">Search Student</h5>
+                    <small class="text-muted">Enter register number to view and update dues.</small>
+                </div>
+                <div class="small text-muted">
+                    <i class="fa-regular fa-clock me-1"></i>
+                    <span id="current-datetime"></span>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="due_date" class="form-label">Due Date</label>
-                <input type="date" id="due_date" name="due_date" class="form-control" required>
+
+            <form id="search-form" class="row g-2 align-items-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="position-relative">
+                        <i class="fa-solid fa-id-card input-icon"></i>
+                        <input type="text" class="form-control input-with-icon" id="reg_number"
+                               placeholder="Enter Register Number" required>
+                    </div>
+                </div>
+                <div class="col-md-3 col-lg-2 d-grid d-md-block">
+                    <button type="submit" class="btn btn-primary px-4 w-100">
+                        <span id="search-text"><i class="fa-solid fa-magnifying-glass me-2"></i>Search</span>
+                        <span id="search-spinner" class="spinner-border spinner-border-sm d-none" role="status"
+                              aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="col-md-3 col-lg-2 d-grid d-md-block">
+                    <button type="button" id="new-search-btn" class="btn btn-outline-secondary w-100" disabled>
+                        <i class="fa-solid fa-user-plus me-2"></i>New Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Student Info & Dues -->
+        <div id="student-section" style="{% if student %}display:block;{% else %}display:none;{% endif %}">
+            <div class="row g-3 mb-3">
+                <!-- Student Card -->
+                <div class="col-lg-4">
+                    <div class="student-card p-4 h-100">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="avatar-circle" id="student-avatar">
+                                <span>
+                                    {% if student %}
+                                        {{ student.name|slice:":1" }}{{ student.name|cut:" "|slice:":1" }}
+                                    {% else %}
+                                        ST
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0" id="student-name">
+                                    {% if student %}{{ student.name }}{% else %}Student Name{% endif %}
+                                </h5>
+                                <small class="text-muted" id="student-reg">
+                                    {% if student %}Reg. No: {{ student.register_number }}{% else %}Reg. No: -{% endif %}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="badge rounded-pill bg-light text-muted border">
+                                <i class="fa-solid fa-building-columns me-1"></i>
+                                <span id="student-branch">
+                                    {% if student %}{{ student.branch }}{% else %}Branch{% endif %}
+                                </span>
+                            </span>
+                            <span class="badge rounded-pill bg-light text-muted border">
+                                <i class="fa-solid fa-layer-group me-1"></i>
+                                Sem <span id="student-sem">-</span>
+                            </span>
+                        </div>
+
+                        <div>
+                            <div class="small text-muted mb-1">Current Status</div>
+                            <span id="status-badge"
+                                  class="badge badge-status text-bg-success">
+                                <i class="fa-solid fa-circle-check me-1"></i>No Dues
+                            </span>
+                        </div>
+
+                        <hr>
+
+                        <div class="small text-muted">
+                            <div class="mb-1">
+                                <i class="fa-regular fa-user me-1"></i>
+                                Department: <strong>{{ request.user.profile.department|default:"Department" }}</strong>
+                            </div>
+                            <div id="last-updated">
+                                <i class="fa-regular fa-pen-to-square me-1"></i>
+                                Last updated: <span id="last-updated-time" class="text-body-secondary">—</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dues Update Card -->
+                <div class="col-lg-8">
+                    <div class="dues-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 fw-semibold">Update Dues</h5>
+                            <span class="badge rounded-pill bg-primary-subtle text-primary">
+                                {{ request.user.profile.department|default:"Department" }} Department
+                            </span>
+                        </div>
+
+                        <!-- FORM TO SAVE DUE -->
+                       <form method="post" action="{% url 'add_due' %}" id="due-form" onsubmit="setTimeout(()=>refreshStudentStatus(hiddenReg.value), 500)">
+
+                            {% csrf_token %}
+                            <!-- Hidden register number (filled by JS or context) -->
+                            <input type="hidden" name="register_number" id="hidden-register-number"
+                                   value="{% if student %}{{ student.register_number }}{% endif %}">
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4 d-flex align-items-center gap-2">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="has_dues">
+                                        <label class="form-check-label switch-label" for="has_dues">
+                                            Student has dues
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 d-none" id="due-date-group">
+                                    <label for="due_date" class="form-label small mb-1">Due Date</label>
+                                    <input type="date" id="due_date" name="due_date" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small mb-1">Department</label>
+                                    <input type="text" class="form-control"
+                                           value="{{ request.user.profile.department|default:'Department' }}" readonly>
+                                </div>
+                                <div class="col-12 d-none" id="remark-group">
+                                    <label for="remark" class="form-label small mb-1">Remark / Reason</label>
+                                    <textarea id="remark" name="remark" class="form-control rounded-16" rows="2"
+                                              placeholder="Eg: Book not returned – Database Systems"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="submit" class="btn btn-primary" id="btn-update">
+                                    <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                                </button>
+                                <!-- ❌ Removed Mark As No Dues button -->
+                                <button type="button" class="btn btn-outline-secondary" id="btn-print">
+                                    <i class="fa-solid fa-print me-2"></i>Print / Download Slip
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-success btn-custom"><i class="fa fa-plus me-1"></i> Add Due</button>
-        </form>
+
+            <!-- History Card -->
+            <div class="history-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-semibold">Recent Dues History</h6>
+                    <small class="text-muted">Showing last 5 updates for this student</small>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle mb-0 text-center">
+                        <thead class="small text-muted">
+                        <tr>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Updated By</th>
+                            <th>Remark</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="history-body">
+                        {% if dues %}
+                            {% for due in dues %}
+                                <tr class="small">
+                                    <td>{{ due.department }}</td>
+
+                                    <td>
+                                        <span class="badge rounded-pill text-bg-{% if due.has_dues %}danger{% else %}success{% endif %} small">
+                                            {% if due.has_dues %}Pending{% else %}Cleared{% endif %}
+                                        </span>
+                                    </td>
+
+                                    <td>{{ due.due_date|date:"m/d/Y" }}</td>
+                                    <td>{{ due.updated_by.username }}</td>
+                                    <td>{{ due.remark }}</td>
+
+                                    <td>
+                                        {% if due.has_dues %}
+                                            <form method="post" action="{% url 'clear_due' due.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fa-solid fa-circle-check me-1"></i> Clear
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-success">
+                                    {% if student %}
+                                        ✅ No previous dues
+                                    {% else %}
+                                        Search a student to view dues.
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-    {% endif %}
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Hidden template for clear_due URL (for JS) -->
+<div id="clear-due-url-template" data-url="{% url 'clear_due' 0 %}" style="display:none;"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const searchForm = document.getElementById('search-form');
+    const regInput = document.getElementById('reg_number');
+    const studentSection = document.getElementById('student-section');
+    const newSearchBtn = document.getElementById('new-search-btn');
+    const searchSpinner = document.getElementById('search-spinner');
+    const searchText = document.getElementById('search-text');
+
+    const hasDues = document.getElementById('has_dues');
+    const dueDateGroup = document.getElementById('due-date-group');
+    const remarkGroup = document.getElementById('remark-group');
+    const statusBadge = document.getElementById('status-badge');
+
+    const alertContainer = document.getElementById('alert-container');
+    const alertMessage = document.getElementById('alert-message');
+
+    const historyBody = document.getElementById("history-body");
+    const hiddenReg = document.getElementById("hidden-register-number");
+
+    const clearDueUrlTemplateEl = document.getElementById("clear-due-url-template");
+    const clearDueUrlTemplate = clearDueUrlTemplateEl ? clearDueUrlTemplateEl.dataset.url : "/clear-due/0/";
+
+    function showAlert(message, type) {
+        alertContainer.style.display = 'block';
+        const alertDiv = alertContainer.querySelector('.alert');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show rounded-16 py-2 px-3`;
+        alertMessage.textContent = message;
+    }
+
+    function resetAlert() {
+        alertContainer.style.display = 'none';
+    }
+
+    // Toggle dues extra fields
+    hasDues.addEventListener('change', () => {
+        const on = hasDues.checked;
+        dueDateGroup.classList.toggle('d-none', !on);
+        remarkGroup.classList.toggle('d-none', !on);
+    });
+
+    // Student search
+    searchForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        resetAlert();
+
+        const reg = regInput.value.trim();
+        if (reg.length < 4) {
+            showAlert('Please enter a valid register number.', 'warning');
+            return;
+        }
+
+        searchSpinner.classList.remove('d-none');
+        searchText.classList.add('d-none');
+
+        fetch(`/others/ajax-search-student/?register_number=${reg}`)
+            .then(res => res.json())
+            .then(data => {
+                const lastUpdatedEl = document.getElementById("last-updated-time");
+            if (lastUpdatedEl) {
+                lastUpdatedEl.textContent = data.last_updated || "—";
+            }
+
+
+                searchSpinner.classList.add('d-none');
+                searchText.classList.remove('d-none');
+
+                if (data.status === "error") {
+                    showAlert("❌ Student not found in database.", "danger");
+                    studentSection.style.display = "none";
+                    return;
+                }
+
+                // Student info
+                document.getElementById('student-name').textContent = data.student.name;
+                document.getElementById('student-reg').textContent = "Reg. No: " + data.student.register_number;
+                document.getElementById('student-branch').textContent = data.student.branch;
+                document.getElementById('student-sem').textContent = data.student.semester ?? "—";
+
+                hiddenReg.value = data.student.register_number;
+
+                const parts = data.student.name.trim().split(" ");
+                const initials = parts.length > 1
+                    ? parts[0][0] + parts[1][0]
+                    : parts[0][0];
+                document.getElementById('student-avatar').innerHTML = `<span>${initials.toUpperCase()}</span>`;
+
+                // History from DB
+                historyBody.innerHTML = "";
+
+                if (data.dues.length > 0) {
+                    data.dues.forEach(d => {
+                        const hasPending =
+                            d.has_dues === true ||
+                            d.has_dues === "True" ||
+                            d.has_dues === "true" ||
+                            d.has_dues === 1;
+
+                        const clearUrl = clearDueUrlTemplate.replace("0", d.id);
+
+                        historyBody.innerHTML += `
+                            <tr class="small">
+                                <td>${d.department}</td>
+                                <td>
+                                    <span class="badge rounded-pill text-bg-${hasPending ? "danger" : "success"} small">
+                                        ${hasPending ? "Pending" : "Cleared"}
+                                    </span>
+                                </td>
+                                <td>${d.date}</td>
+                                <td>${d.updated_by || "-"}</td>
+
+                                <td>${d.remark || "-"}</td>
+                                <td>
+                                    ${hasPending ? `
+                                        <form method="post" action="${clearUrl}" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="${getCSRFToken()}">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fa-solid fa-circle-check me-1"></i> Clear
+                                            </button>
+                                        </form>
+                                    ` : `<span class="text-muted">—</span>`}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    historyBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center text-success">
+                                ✅ No previous dues
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                // Status badge from DB
+                if (data.has_any_pending) {
+                    statusBadge.className = 'badge badge-status text-bg-danger';
+                    statusBadge.innerHTML = '<i class="fa-solid fa-circle-exclamation me-1"></i>Dues Pending';
+                } else {
+                    statusBadge.className = 'badge badge-status text-bg-success';
+                    statusBadge.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i>No Dues';
+                }
+
+                studentSection.style.display = 'block';
+                regInput.setAttribute('readonly', true);
+                newSearchBtn.disabled = false;
+
+                showAlert('✅  student record loaded from database.', 'success');
+            })
+            .catch(() => {
+                searchSpinner.classList.add('d-none');
+                searchText.classList.remove('d-none');
+                showAlert("⚠️ Server error. Try again.", "danger");
+            });
+    });
+
+    // Reset search
+    newSearchBtn.addEventListener('click', () => {
+        resetAlert();
+        regInput.value = '';
+        regInput.removeAttribute('readonly');
+        studentSection.style.display = 'none';
+        newSearchBtn.disabled = true;
+        hasDues.checked = false;
+        dueDateGroup.classList.add('d-none');
+        remarkGroup.classList.add('d-none');
+
+        statusBadge.className = 'badge badge-status text-bg-success';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i>No Dues';
+
+        historyBody.innerHTML = '';
+        hiddenReg.value = '';
+    });
+
+    // Print
+    document.getElementById('btn-print').addEventListener('click', () => {
+        window.print();
+    });
+
+    // Live datetime
+    
+    function getCSRFToken() {
+        return document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+    }
+
+
+
+
+    function refreshStudentStatus(regNumber) {
+    fetch(`/others/ajax-search-student/?register_number=${regNumber}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.has_any_pending) {
+                statusBadge.className = 'badge badge-status text-bg-danger';
+                statusBadge.innerHTML = '<i class="fa-solid fa-circle-exclamation me-1"></i>Dues Pending';
+            } else {
+                statusBadge.className = 'badge badge-status text-bg-success';
+                statusBadge.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i>No Dues';
+            }
+
+
+            
+        });
+}
+
+
+
+// ✅ Auto-load student after redirect from add_due
+window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const reg = params.get("register_number");
+
+    if (reg) {
+        regInput.value = reg;
+        searchForm.dispatchEvent(new Event("submit"));
+    }
+});
+
+
+    function updateDateTime() {
+        const el = document.getElementById("current-datetime");
+        if (!el) return;
+
+        const now = new Date();
+
+        const options = {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        };
+
+        el.textContent = now.toLocaleString("en-US", options);
+    }
+
+    // Run immediately
+    updateDateTime();
+
+    // Update every second
+    setInterval(updateDateTime, 1000);
+
+
+
+
+
+
+</script>
+
 </body>
 </html>

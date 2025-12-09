@@ -38,6 +38,9 @@ urlpatterns = [
  
 path('admin-panel/', include('accounts.admin_panel.urls')),
 
+
+path("check-username/", views.check_username, name="check_username"),
+
 ]
 
    
