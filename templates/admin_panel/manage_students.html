@@ -1,96 +1,16 @@
 <div id="manageStudents" class="section {% if section == 'manageStudents' %}active{% endif %}">
-
-    <!-- ✅ THEME STYLES ONLY FOR THIS PAGE -->
-    <style>
-        #manageStudents .glass-card {
-            animation: fadeUp 0.45s ease;
-            border-radius: 20px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
-            padding: 26px;
-        }
-
-        #manageStudents h4 {
-            color: white;
-            font-weight: 700;
-        }
-
-        #studentSearch {
-            background: #020617;
-            color: white;
-            border-radius: 14px;
-            border: 1px solid #22d3ee;
-        }
-
-        #studentSearch::placeholder {
-            color: #9ca3af;
-        }
-
-        #studentSearch:focus {
-            background: #020617;
-            color: white;
-            box-shadow: 0 0 0 2px rgba(34,211,238,0.5);
-            border-color: #22d3ee;
-        }
-
-        #manageStudents table {
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-        #manageStudents th {
-            font-weight: 700;
-            text-align: center;
-        }
-
-        #manageStudents td {
-            color: #e5e7eb;
-            text-align: center;
-        }
-
-        #manageStudents .badge {
-            font-size: 0.85rem;
-            padding: 6px 12px;
-        }
-
-        .back-btn {
-            border-radius: 999px;
-            padding: 6px 18px;
-        }
-    </style>
-
-    <!-- ✅ MAIN CARD -->
-    <div class="glass-card">
-
-        <!-- ✅ HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="mb-0">Manage Students</h4>
-            <button class="btn btn-secondary back-btn" onclick="backToStudentOptions()">⬅ Back</button>
-        </div>
-
-        <!-- ✅ SEARCH -->
+    <div class="card card-section">
+        <h4>Manage Students</h4>
         <div class="mb-3">
-            <input type="text"
-                   id="studentSearch"
-                   class="form-control"
-                   placeholder="Search by Register Number"
-                   onkeyup="searchStudent()">
+            <input type="text" id="studentSearch" class="form-control" placeholder="Search by Register Number" onkeyup="searchStudent()">
         </div>
-
-        <!-- ✅ UPGRADE BUTTON -->
-        <form method="post" action="{% url 'admin_panel:upgrade_semesters' %}" class="mb-4">
+        <form method="post" action="{% url 'admin_panel:upgrade_semesters' %}" class="mb-3">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100">
-                ⬆ Upgrade All Students' Semester
-            </button>
+            <button type="submit" class="btn btn-primary">Upgrade All Students' Semester</button>
         </form>
-
-        <!-- ✅ STUDENT TABLE -->
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle" id="studentTable">
-
-                <thead style="background: linear-gradient(135deg, #22d3ee, #4f46e5); color: black;">
+            <table class="table table-bordered table-hover align-middle" id="studentTable">
+                <thead class="table-primary">
                     <tr>
                         <th>Name</th>
                         <th>Register Number</th>
@@ -99,42 +19,26 @@
                         <th>Manage</th>
                     </tr>
                 </thead>
-
                 <tbody>
                 {% for student in students %}
                     <tr>
                         <td>{{ student.name }}</td>
                         <td>{{ student.register_number }}</td>
                         <td>{{ student.branch }}</td>
+                        <td>{{ student.semester }}</td>
                         <td>
-                            <span class="badge bg-info text-dark">
-                                {{ student.semester }}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{% url 'admin_panel:edit_student' student.pk %}"
-                               class="btn btn-warning btn-sm me-1">
-                                ✏ Edit
-                            </a>
-                            <a href="{% url 'admin_panel:delete_student' student.pk %}"
-   class="btn btn-danger btn-sm">
-   🗑 Delete
-</a>
-
-
+                            <a href="{% url 'admin_panel:edit_student' student.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="#" class="btn btn-danger btn-sm delete-btn" 
+                               data-url="{% url 'admin_panel:delete_student' student.pk %}" 
+                               data-name="{{ student.name }}">Delete</a>
                         </td>
                     </tr>
                 {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center text-secondary py-4">
-                            No students found.
-                        </td>
-                    </tr>
+                    <tr><td colspan="5" class="text-center">No students found.</td></tr>
                 {% endfor %}
                 </tbody>
-
             </table>
         </div>
-
+        <button class="btn btn-secondary back-btn" onclick="backToStudentOptions()">Back</button>
     </div>
 </div>

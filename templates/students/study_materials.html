@@ -37,109 +37,67 @@
 
     {% if materials %}
         <!-- Links Section -->
-      <!-- Links Section -->
-{% with links=materials|dictsort:"category" %}
-{% if links %}
-<div class="card">
-    <div class="card-header bg-primary text-white">
-        Links
-    </div>
-    <div class="card-body">
-        {% for m in materials %}
-            {% if m.category == 'links' %}
-                <div class="material-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+        {% with links=materials|dictsort:"category" %}
+        {% if links %}
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                Links
+            </div>
+            <div class="card-body">
+                {% for m in materials %}
+                    {% if m.category == 'links' %}
+                        <div class="material-item">
+                            <span>{{ m.title }}</span>
+                            <a href="{{ m.link }}" target="_blank" class="btn btn-sm btn-success">Open Link</a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
 
-                    <!-- ✅ SUBJECT DETAILS + TITLE -->
-                    <div>
-                        <strong class="text-primary">
-                            {{ m.subject.name }} 
-                            (Sem {{ m.subject.semester }} - {{ m.subject.branch }})
-                        </strong><br>
-                        <span class="text-muted">{{ m.title }}</span>
-                    </div>
-
-                    <a href="{{ m.link }}" target="_blank"
-                       class="btn btn-sm btn-success">
-                        Open Link
-                    </a>
-
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
-{% endwith %}
-
-
-<!-- Previous Year Question Papers Section -->
-{% with qps=materials|dictsort:"category" %}
-{% if qps %}
-<div class="card">
-    <div class="card-header bg-warning text-dark">
-        Previous Year Question Papers
-    </div>
-    <div class="card-body">
-        {% for m in materials %}
-            {% if m.category == 'qp' %}
-                <div class="material-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-
-                    <!-- ✅ SUBJECT DETAILS + TITLE -->
-                    <div>
-                        <strong class="text-primary">
-                            {{ m.subject.name }} 
-                            (Sem {{ m.subject.semester }} - {{ m.subject.branch }})
-                        </strong><br>
-                        <span class="text-muted">{{ m.title }}</span>
-                    </div>
-
-                    <a href="{{ m.file.url }}" target="_blank"
-                       class="btn btn-sm btn-primary">
-                        Download
-                    </a>
-
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
-{% endwith %}
-
+        <!-- Previous Year Question Papers Section -->
+        {% with qps=materials|dictsort:"category" %}
+        {% if qps %}
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                Previous Year Question Papers
+            </div>
+            <div class="card-body">
+                {% for m in materials %}
+                    {% if m.category == 'qp' %}
+                        <div class="material-item">
+                            <span>{{ m.title }}</span>
+                            <a href="{{ m.file.url }}" target="_blank" class="btn btn-sm btn-primary">Download</a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
 
         <!-- Notes Section (optional) -->
         {% with notes=materials|dictsort:"category" %}
-    {% if notes %}
-    <div class="card">
-        <div class="card-header bg-info text-white">
-            Study Notes
-        </div>
-        <div class="card-body">
-            {% for m in materials %}
-                {% if m.category == 'notes' %}
-                    <div class="material-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-
-                        <!-- ✅ SUBJECT DETAILS + TITLE -->
-                        <div>
-                            <strong class="text-primary">
-                                {{ m.subject.name }} 
-                                (Sem {{ m.subject.semester }} - {{ m.subject.branch }})
-                            </strong><br>
-                            <span class="text-muted">{{ m.title }}</span>
+        {% if notes %}
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                Study Notes
+            </div>
+            <div class="card-body">
+                {% for m in materials %}
+                    {% if m.category == 'notes' %}
+                        <div class="material-item">
+                            <span>{{ m.title }}</span>
+                            <a href="{{ m.file.url }}" target="_blank" class="btn btn-sm btn-primary">Download</a>
                         </div>
-
-                        <a href="{{ m.file.url }}" target="_blank"
-                           class="btn btn-sm btn-primary">
-                            Download
-                        </a>
-
-                    </div>
-                {% endif %}
-            {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
-    </div>
-    {% endif %}
-{% endwith %}
+        {% endif %}
+        {% endwith %}
 
     {% else %}
         <p class="alert alert-warning">No study materials uploaded yet.</p>
