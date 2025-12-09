@@ -34,10 +34,10 @@ body {
 }
 
 /* Icon positions + colors */
-.icon1 { top: 15%; left: 10%; color: #007bff; animation-delay: 0s; }       /* Blue */
-.icon2 { top: 25%; right: 15%; color: #ff9800; animation-delay: 1.5s; }     /* Orange */
-.icon3 { bottom: 20%; left: 18%; color: #28a745; animation-delay: 3s; }     /* Green */
-.icon4 { bottom: 15%; right: 10%; color: #6f42c1; animation-delay: 4.5s; }  /* Purple */
+.icon1 { top: 15%; left: 10%; color: #d4132a; animation-delay: 0s; }       /* Blue */
+.icon2 { top: 25%; right: 15%; color: #c71414; animation-delay: 1.5s; }     /* Orange */
+.icon3 { bottom: 20%; left: 18%; color: #077020; animation-delay: 3s; }     /* Green */
+.icon4 { bottom: 15%; right: 10%; color: #161614; animation-delay: 4.5s; }  /* Purple */
 
 .floating-icon {
     text-shadow: 0 0 10px rgba(255,255,255,0.8);
@@ -111,11 +111,19 @@ p.text-muted { font-size: 0.9rem; }
 <i class="fa-solid fa-chalkboard-teacher floating-icon icon4"></i>
 
 <!-- ❓ Floating Help Icon -->
-<i class="fa-solid fa-circle-question help-icon" title="Need Help?" 
-   onclick="Swal.fire('Help', 'Contact your admin for login support.', 'info')"></i>
+<i class="fa-solid fa-circle-question help-icon" title="Need Help?"
+   onclick="Swal.fire({
+     title: 'Need Help?',
+     html: 'Contact your admin for login support.<br><br>'
+         + '<a href=\'mailto:admin@example.com\' class=\'btn btn-primary\'>'
+         + 'contact Admin</a>',
+     icon: 'info',
+     showConfirmButton: false
+   })">
+</i>
 
 <div class="login-card">
-     <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg" alt="Logo" style="width:100px;">
+    <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg' %" alt="Logo" class="logo">
     <h3>Smart Academic System</h3>
     <p class="text-muted">Login to access your dashboard</p>
 

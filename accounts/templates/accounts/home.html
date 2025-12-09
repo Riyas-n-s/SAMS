@@ -219,14 +219,20 @@ html, body {
     .feature-row, .feature-row.reverse { flex-direction: column; gap: 30px; }
     .feature-content, .feature-image { text-align: center; }
 }
+.navbar-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 100px;
+}
 
-div.navbar-center img {
-    margin-left: 185px;
-    margin-top:10px;
+.navbar-center img {
     height: 70px;
     width: 70px;
-    
+
 }
+
+
 
 :root {
     --dark-bg: #101010;
@@ -411,14 +417,12 @@ div.navbar-center img {
       border-radius: 2px;
     }
 
-
-
-    div.navbar-center img {
+    /* Remove hard-coded logo margin */
+div.navbar-center img {
     margin-left: 0;
     margin-top: 0;
     height: 70px;
     width: 70px;
-    ma
 }
 
 .navbar-left{
@@ -504,19 +508,13 @@ div.navbar-center img {
 }
 
 </style>
-
-
-<link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg" />
-
-
 </head>
 
 <body>
-
 <header class="navbar">
     <div class="navbar-left">SAMS</div>
     <div class="navbar-center">
-        <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg" alt="SAMS Logo">
+        <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/logo.jpeg' %" alt="SAMS Logo">
     </div>
     <nav class="navbar-right">
         <a href="{% url 'loader_page' 'home' %}">Home</a>
@@ -533,7 +531,7 @@ div.navbar-center img {
             <a href="{% url 'loader_page' 'login' %}" class="cta-button">Get Started</a>
         </div>
         <div class="hero-illustration scroll-animate" data-animate="fade-right">
-            <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/first.0.2.jpeg" alt="LMS Illustration">
+            <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/first.0.2.jpeg' %" alt="LMS Illustration">
         </div>
     </div>
 </section>
@@ -566,8 +564,7 @@ div.navbar-center img {
 <!-- ===== Top Row: Raise Doubts ===== -->
 <div class="feature-row scroll-animate" data-animate="fade-left">
   <div class="feature-image">
-    <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/chat.jpeg" alt="Chat Image">
-
+    <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/chat.jpeg' %" alt="Raise Doubts Illustration">
   </div>
   <div class="feature-content">
     <h2>Raise Student Doubts & Chat</h2>
@@ -583,8 +580,7 @@ div.navbar-center img {
 <!-- ===== Bottom Row: No-Dues ===== -->
 <div class="feature-row reverse scroll-animate" data-animate="fade-right">
   <div class="feature-image">
-    <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/nodues.jpeg" alt="Happy Image">
-
+    <img src="https://raw.githubusercontent.com/Riyas-n-s/SAMS/master/static/accounts/images/nodues.jpeg' %" alt="No-Dues Illustration">
   </div>
   <div class="feature-content">
     <h2>No-Dues Clearance</h2>
