@@ -12,7 +12,8 @@
 body {
     background: #ffffff;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     font-family: 'Poppins', sans-serif;
     display: flex;
     justify-content: center;
@@ -45,7 +46,8 @@ body {
 
 /* Login Card */
 .login-card {
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
     background: #fff;
     border-radius: 20px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
@@ -100,6 +102,42 @@ p.text-muted { font-size: 0.9rem; }
     50% { transform: translateY(-15px); }
     100% { transform: translateY(0); }
 }
+
+    /* ================= MOBILE RESPONSIVE FIX ================= */
+
+@media (max-width: 768px) {
+
+    body {
+        padding: 20px;
+        align-items: flex-start;
+    }
+
+    .login-card {
+        padding: 30px 20px;
+        margin-top: 40px;
+    }
+
+    .logo {
+        width: 70px;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+    }
+
+    /* Reduce floating icons so they don’t overlap */
+    .floating-icon {
+        font-size: 30px;
+        opacity: 0.12;
+    }
+
+    .help-icon {
+        font-size: 36px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
+
 </style>
 </head>
 <body>
